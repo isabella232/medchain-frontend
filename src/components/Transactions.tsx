@@ -3,8 +3,9 @@ import { FunctionComponent, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import classes from "../classes/classes";
-import { formatHash } from "../tools/formatHash";
+import { formatHash } from "../tools/format";
 import PageLayout from "./PageLayout";
+import { SignButton, ExecuteButton } from "../components/Buttons";
 
 const transactionsData = {
   history: [
@@ -23,6 +24,7 @@ const transactionsData = {
       ],
       expireBlockIndex: 54,
       maxNumExecution: 1,
+      execResults: {},
     },
     {
       transactionID:
@@ -39,6 +41,7 @@ const transactionsData = {
       ],
       expireBlockIndex: 54,
       maxNumExecution: 1,
+      execResults: {},
     },
     {
       transactionID:
@@ -55,6 +58,7 @@ const transactionsData = {
       ],
       expireBlockIndex: 54,
       maxNumExecution: 1,
+      execResults: {},
     },
   ],
   pending: [
@@ -89,10 +93,14 @@ const transactionsData = {
 const TransactionLine: FunctionComponent<{
   transactionDetails: any;
   onClick: any;
-}> = ({ transactionDetails, onClick }) => {
+  selected?: boolean;
+}> = ({ transactionDetails, onClick, selected }) => {
   return (
     <button
-      className="focus:outline-none shadow-lg w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white"
+      className={classnames(
+        "focus:outline-none shadow-lg w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
+        selected && "border-primary-400"
+      )}
       onClick={onClick}
     >
       <span>{formatHash(transactionDetails.transactionID)}</span>
@@ -111,10 +119,10 @@ const Transactions = () => {
         <button
           className={classnames(
             classes.navButton,
-            viewIndex == 0 && "border-primary-400"
+            viewIndex === 0 && "border-primary-400"
           )}
           onClick={(e) => {
-            if (viewIndex != 0) setSelectedTransaction(undefined);
+            if (viewIndex !== 0) setSelectedTransaction(undefined);
             setViewIndex(0);
           }}
         >
@@ -123,10 +131,10 @@ const Transactions = () => {
         <button
           className={classnames(
             classes.navButton,
-            viewIndex == 1 && "border-primary-400"
+            viewIndex === 1 && "border-primary-400"
           )}
           onClick={(e) => {
-            if (viewIndex != 1) setSelectedTransaction(undefined);
+            if (viewIndex !== 1) setSelectedTransaction(undefined);
             setViewIndex(1);
           }}
         >
@@ -135,12 +143,13 @@ const Transactions = () => {
       </nav>
       <div className="flex">
         <div className="w-1/2 p-3 space-y-4 ">
-          {viewIndex == 0
+          {viewIndex === 0
             ? transactionsData.pending.map((v) => {
                 return (
                   <TransactionLine
                     transactionDetails={v}
                     onClick={() => setSelectedTransaction(v)}
+                    selected= {selectedTransaction === v}
                   />
                 );
               })
@@ -149,15 +158,19 @@ const Transactions = () => {
                   <TransactionLine
                     transactionDetails={v}
                     onClick={() => setSelectedTransaction(v)}
+                    selected= {selectedTransaction === v}
                   />
                 );
               })}
         </div>
         <div className="w-1/2 p-3">
-          {selectedTransaction != undefined && (
+          {selectedTransaction !== undefined && (
             <div className="bg-white rounded-lg shadow-lg">
               <div className="p-3">
-                <button onClick={() => setSelectedTransaction(undefined)}>
+                <button
+                  onClick={() => setSelectedTransaction(undefined)}
+                  className={classnames("text-red-400")}
+                >
                   <IoMdCloseCircle />
                 </button>
               </div>
@@ -173,20 +186,27 @@ const Transactions = () => {
                 (instruction: any, index: number) => {
                   return (
                     <div className="border-t-2 border-gray-300 p-3 text-sm">
-                        <p
-                          className={classnames("mb-2", classes.boxSubtitle)}
-                        >{`Instruction ${index}`}</p>
-                        <p className="font-bold">Instruction hash</p>
-                        <p>{instruction.hash}</p>
-                        <p className="font-bold">Instruction ID</p>
-                        <p>{instruction.instID}</p>
-                        <p className="font-bold">Action</p>
-                        <p>{instruction.action}</p>
-                        <p className="font-bold">Signatures</p>
-                        <p>{instruction.signatures}</p>
-                      </div>
+                      <p
+                        className={classnames("mb-2", classes.boxSubtitle)}
+                      >{`Instruction ${index}`}</p>
+                      <p className="font-bold">Instruction hash</p>
+                      <p>{instruction.hash}</p>
+                      <p className="font-bold">Instruction ID</p>
+                      <p>{instruction.instID}</p>
+                      <p className="font-bold">Action</p>
+                      <p>{instruction.action}</p>
+                      <p className="font-bold">Signatures</p>
+                      <p>{instruction.signatures}</p>
+                    </div>
                   );
                 }
+              )}
+
+              {selectedTransaction.execResults === undefined && (
+                <div className="p-3 flex space-x-3">
+                  <SignButton />
+                  <ExecuteButton />
+                </div>
               )}
             </div>
           )}

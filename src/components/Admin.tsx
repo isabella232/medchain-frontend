@@ -1,5 +1,4 @@
 import classnames from "classnames";
-import classNames from "classnames";
 import { FunctionComponent } from "react";
 import { FaUsers } from "react-icons/fa";
 import classes from "../classes/classes";
@@ -19,7 +18,7 @@ const PanelElement: FunctionComponent<{ title: string; last?: boolean }> = ({
   last,
 }) => {
   return (
-    <div className={classnames("py-3", !last && "border-b border-gray-300")}>
+    <div className={classnames("py-3 text-xs", !last && "border-b border-gray-300")}>
       <h2 className={classnames("mb-2", classes.boxSubtitle)}>{title}</h2>
       {children}
     </div>
@@ -32,9 +31,9 @@ const Admin = () => {
       <div className="w-1/2 p-3">
         <div className="space-y-3 p-3 bg-white shadow-lg rounded-lg">
           <PanelElement title="BASE Admin DARC ID">
-            <span className="">
+            <p className="">
               999b315d2e19ac4e670578e3cd84a95fac2f5e68ad9725bc5e10da9d8cbee419
-            </span>
+            </p>
           </PanelElement>
           <PanelElement title="Multisignature Policies">
             <div className="">
@@ -50,7 +49,7 @@ const Admin = () => {
           </PanelElement>
           <PanelElement last title="Admininistrators">
             <div className="">
-              <div className="text-sm">
+              <div className="">
                 {adminData.identities.map((item) => {
                   return <div>{item}</div>;
                 })}
