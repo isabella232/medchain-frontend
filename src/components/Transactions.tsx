@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { FunctionComponent, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
+import classes from "../classes/classes";
 import { formatHash } from "../tools/formatHash";
 import PageLayout from "./PageLayout";
 
@@ -91,7 +92,7 @@ const TransactionLine: FunctionComponent<{
 }> = ({ transactionDetails, onClick }) => {
   return (
     <button
-      className="focus:outline-none shadow-lg w-full px-8 py-2 rounded-lg text-gray-700 text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white"
+      className="focus:outline-none shadow-lg w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white"
       onClick={onClick}
     >
       <span>{formatHash(transactionDetails.transactionID)}</span>
@@ -160,8 +161,8 @@ const Transactions = () => {
                   <IoMdCloseCircle />
                 </button>
               </div>
-              <div className="p-3">
-                <p className="font-bold uppercase text-sm text-gray-700 mb-2">
+              <div className="p-3 text-sm">
+                <p className={classNames("mb-2", classes.boxSubtitle)}>
                   Deferred Transacation
                 </p>
                 <p className="font-bold">Transaction ID</p>
@@ -171,9 +172,10 @@ const Transactions = () => {
               {selectedTransaction.instructions.map(
                 (instruction: any, index: number) => {
                   return (
-                    <div className="border-t-2 border-gray-300 p-3">
-                      <div className="text-sm">
-                        <p className="font-bold uppercase text-sm text-gray-700 mb-2">{`Instruction ${index}`}</p>
+                    <div className="border-t-2 border-gray-300 p-3 text-sm">
+                        <p
+                          className={classNames("mb-2", classes.boxSubtitle)}
+                        >{`Instruction ${index}`}</p>
                         <p className="font-bold">Instruction hash</p>
                         <p>{instruction.hash}</p>
                         <p className="font-bold">Instruction ID</p>
@@ -183,7 +185,6 @@ const Transactions = () => {
                         <p className="font-bold">Signatures</p>
                         <p>{instruction.signatures}</p>
                       </div>
-                    </div>
                   );
                 }
               )}
