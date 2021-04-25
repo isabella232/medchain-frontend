@@ -98,7 +98,7 @@ const TransactionLine: FunctionComponent<{
   return (
     <button
       className={classnames(
-        "focus:outline-none shadow-lg w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
+        "focus:outline-none shadow w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
         selected && "border-primary-400"
       )}
       onClick={onClick}
@@ -142,7 +142,7 @@ const Transactions = () => {
         </button>
       </nav>
       <div className="flex">
-        <div className="w-1/2 p-3 space-y-4 ">
+        <div className="w-1/2 p-3 space-y-2">
           {viewIndex === 0
             ? transactionsData.pending.map((v) => {
                 return (
