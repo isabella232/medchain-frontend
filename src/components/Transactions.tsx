@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classnames from "classnames";
 import { FunctionComponent, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
@@ -107,10 +107,10 @@ const Transactions = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<any>();
   return (
     <PageLayout title="Transactions" icon={FaExchangeAlt}>
-      <nav className="space-x-4 bg-white px-8 pt-2 shadow-md mb-4">
+      <nav className={classnames(classes.nav)}>
         <button
-          className={classNames(
-            "focus:outline-none border-b-4 border-transparent text-xs py-3 tracking-wide font-bold  uppercase  box-content",
+          className={classnames(
+            classes.navButton,
             viewIndex == 0 && "border-primary-400"
           )}
           onClick={(e) => {
@@ -121,8 +121,8 @@ const Transactions = () => {
           Queue
         </button>
         <button
-          className={classNames(
-            "focus:outline-none border-b-4 border-transparent text-xs py-3 tracking-wide font-bold  uppercase  box-content",
+          className={classnames(
+            classes.navButton,
             viewIndex == 1 && "border-primary-400"
           )}
           onClick={(e) => {
@@ -162,7 +162,7 @@ const Transactions = () => {
                 </button>
               </div>
               <div className="p-3 text-sm">
-                <p className={classNames("mb-2", classes.boxSubtitle)}>
+                <p className={classnames("mb-2", classes.boxSubtitle)}>
                   Deferred Transacation
                 </p>
                 <p className="font-bold">Transaction ID</p>
@@ -174,7 +174,7 @@ const Transactions = () => {
                   return (
                     <div className="border-t-2 border-gray-300 p-3 text-sm">
                         <p
-                          className={classNames("mb-2", classes.boxSubtitle)}
+                          className={classnames("mb-2", classes.boxSubtitle)}
                         >{`Instruction ${index}`}</p>
                         <p className="font-bold">Instruction hash</p>
                         <p>{instruction.hash}</p>
