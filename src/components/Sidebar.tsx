@@ -13,8 +13,8 @@ const SidebarNavLink: FunctionComponent<{
     <NavLink
       exact
       to={to}
-      className="block flex text-white items-center hover:bg-primary-600 px-3 py-2"
-      activeClassName="bg-primary-600"
+      className="block flex text-white items-center border-r-4 border-transparent hover:border-primary-200 hover:bg-primary-600 px-3 py-2"
+      activeClassName="bg-primary-600 border-primary-200"
     >
       <Icon />
       <span className="ml-2 text-xl">{title}</span>
@@ -26,7 +26,7 @@ const Sidebar = () => {
   return (
     <div className="w-52 h-full bg-primary-400">
       <h1 className="font-bold text-white text-2xl m-3">Medchain</h1>
-      <SidebarNavLink icon={FaUsers} title="Admins" to="/" />
+      <SidebarNavLink icon={FaUsers} title="Admins" to="/admins" />
       <SidebarNavLink
         icon={FaExchangeAlt}
         title="Transactions"

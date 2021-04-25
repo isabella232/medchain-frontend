@@ -1,14 +1,13 @@
 import { FunctionComponent } from "react";
+import { FaUsers } from "react-icons/fa";
 import {
     ModifyButton
 } from "./Buttons";
 import PageLayout from "./PageLayout";
 
+
 const adminData = {
   identities: [
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
     "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
     "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
     "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
@@ -28,7 +27,7 @@ const PanelElement: FunctionComponent<{ title: string }> = ({
 
 const Admin = () => {
   return (
-    <PageLayout title="Administrator Consortium">
+    <PageLayout title="Administrator Consortium" icon={FaUsers}>
       <div className="w-1/2 p-3 border-r border-gray-300">
         <div className="space-y-3">
           <PanelElement title="BASE Admin DARC ID">
