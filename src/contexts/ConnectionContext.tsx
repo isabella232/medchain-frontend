@@ -1,4 +1,5 @@
 import React, { createContext, FunctionComponent, useState } from "react";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 export type ConnectionType = {
   connected: boolean;
@@ -10,7 +11,7 @@ export type ConnectionContextType = {
   setConnection: (name: ConnectionType) => void;
 };
 
-const ConnectionDefaultValues = {
+const ConnectionDefaultValues:ConnectionContextType = {
   connection: {
     connected: false,
     public: "",
@@ -26,7 +27,7 @@ export const ConnectionContext = createContext<ConnectionContextType>(
 const ConnectedContextProvider: FunctionComponent<{ children: any }> = ({
   children,
 }) => {
-  const [connection, setConnection] = useState(
+  const [connection, setConnection] = useLocalStorage('medchain-keys',
     ConnectionDefaultValues.connection
   );
 
