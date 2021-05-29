@@ -32,9 +32,18 @@ const Instruction: FunctionComponent<{
   executed?: boolean;
 }> = ({ instructionHash, instructionData, index, instanceID, executed }) => {
   const { connection, setConnection } = useContext(ConnectionContext);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [signers, setSigners] = useState<string[]>([]);
   const openSignModal = () => {
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    setSigners(
+      instructionData.signerIdentities.map((signer) => signer.toString())
+    );
+  });
+
   const signInstruction = () => {
     const tx = signDeferredTransaction(
       connection.private,
@@ -46,11 +55,14 @@ const Instruction: FunctionComponent<{
     sendTransaction(tx, connection.private)
       .then((res) => {
         console.log(res);
+        setIsOpen(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setIsOpen(false);
+      });
   };
 
-  const [modalIsOpen, setIsOpen] = useState(false);
   return (
     <div className="">
       <TransactionModal
@@ -73,14 +85,13 @@ const Instruction: FunctionComponent<{
           <div className="">
             {instructionData.signerIdentities.length === 0
               ? "No signature"
-              : instructionData.signerIdentities.map((signer) =>
-                  signer.toString()
-                )}
+              : signers}
           </div>
         </PanelElement>
       </TransactionModal>
       <PanelElement title="Instruction Hash">
-      {instructionHash.toString("hex")} <CopyButton elem={instructionHash.toString("hex")}/>
+        {instructionHash.toString("hex")}{" "}
+        <CopyButton elem={instructionHash.toString("hex")} />
       </PanelElement>
       <PanelElement title="Contract">
         <div className="">{instructionData.invoke.contractID}</div>
@@ -88,15 +99,20 @@ const Instruction: FunctionComponent<{
       <PanelElement title="Command">
         <div className="">{instructionData.invoke.command}</div>
       </PanelElement>
-      <PanelElement title="Signatures" last>
+      <PanelElement
+        title={`Signatures (${instructionData.signatures.length})`}
+        last
+      >
         <div className="">
-          {instructionData.signatures.length == 0
-            ? "No signature"
-            : instructionData.signatures}
+          {instructionData.signatures.length == 0 ? "No signature" : signers}
         </div>
       </PanelElement>
 
-      {!executed && <SignButton onClick={openSignModal} />}
+      {!executed && !signers.includes(connection.public) ? (
+        <SignButton onClick={openSignModal} />
+      ) : (
+        <span className="text-xs font-bold text-primary-400">You already signed the instruction</span>
+      )}
     </div>
   );
 };
@@ -109,13 +125,18 @@ const SelectedTransaction: FunctionComponent<{
   const [transactionData, setTransactionData] = useState<DeferredData>();
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
+
   const executeTransaction = () => {
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
     sendTransaction(tx, connection.private)
       .then((res) => {
         console.log(res);
+        setIsOpen(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setIsOpen(false);
+      });
   };
   const openSignModal = () => {
     setIsOpen(true);
@@ -144,8 +165,8 @@ const SelectedTransaction: FunctionComponent<{
         abortAction={() => setIsOpen(false)}
       ></TransactionModal>
       <PanelElement title="Transaction instance ID">
-        {selectedTransaction.instanceid}  
-        <CopyButton elem={selectedTransaction.instanceid}/>
+        {selectedTransaction.instanceid}
+        <CopyButton elem={selectedTransaction.instanceid} />
       </PanelElement>
       {transactionData ? (
         transactionData.proposedtransaction.instructions.map(
