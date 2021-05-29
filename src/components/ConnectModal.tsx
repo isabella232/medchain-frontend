@@ -1,7 +1,7 @@
-import { FunctionComponent, useState } from "react";
-import Modal from "react-modal";
 import classnames from "classnames";
+import { FunctionComponent, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
+import Modal from "react-modal";
 import { ConnectButton } from "../components/Buttons";
 
 const ConnectModal: FunctionComponent<{

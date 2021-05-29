@@ -1,46 +1,146 @@
-# Getting Started with Create React App
+# Medchain Administration UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Setup
 
-## Available Scripts
+### Setup a Byzcoin chain
 
-In the project directory, you can run:
+#### Inatall medchain
 
-### `yarn start`
+**You need to have the latest version of the Medchain administration cothority service**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```sh
+git clone https://github.com/ldsec/medchain.git
+cd medchain
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```
 
-### `yarn test`
+**Change to the `admin-refactored` branch**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```sh
+git pull origin admin-refactored
+git checkout admin-refactored
+```
 
-### `yarn build`
+-----------
+
+#### Start the byzcoin chain
+
+**Install bcadmin, the byzcoin CLI**
+
+```sh
+git clone https://github.com/dedis/cothority
+cd cothority/byzcoin/bcadmin
+go install
+```
+
+**Start the proxy**
+
+```sh
+cd bypros
+docker-compose up
+```
+
+
+**Start the conodes**
+
+Then, when you launch the conode, export the needed variables for the proxy. The proxy needs two URLs to connect to the database: one with read/write, and another one with read-only access.
+```sh
+ # user/password are set in the dockerfile (root) and the schema (read-only user).
+export PROXY_DB_URL=postgres://bypros:docker@localhost:5432/bypros
+export PROXY_DB_URL_RO=postgres://proxy:1234@localhost:5432/bypros
+```
+
+```sh
+cd conode
+# it will fail if the PROXY_DB_URL* variables are not set!
+go build -o conode && ./run_nodes.sh -v 3 -d tmp
+```
+
+This command will setup 3 nodes and save their files in conode/tmp.
+
+Once the nodes are running, you may want to create a new skipchain, and perform
+basic operations like updating the DARC. This can be done with
+[bcadmin](https://github.com/dedis/cothority/tree/master/byzcoin/bcadmin), the
+Byzcoin CLI:
+
+```sh
+# Tells bcadmin where the config folder is
+BC_CONFIG=conode/tmp 
+# Create a new skipchain
+bcadmin create $BC_CONFIG/public.toml
+# Tells bcadmin about the new skipchain configuration
+export BC=...
+# Print the skipchain info, useful to perform some operations later on
+bcadmin info
+# Print the admin key, which is stored at the same place specified by BC
+bcadmin key -print .../key-ed25519\:...
+# Add a DARC rule, the id can be found with 'bcadmin info'
+bcadmin darc rule -rule spawn:project -id ed25519:...
+```
+
+For instance we will setup the chain to have an admin darc that can setup some projects:
+
+```sh
+# Tells bcadmin where the config folder is
+BC_CONFIG=conode/tmp 
+# Create a new skipchain and output the Byzcoin chain ID that you can directly copy paste
+bcadmin create $BC_CONFIG/public.toml
+# Tells bcadmin about the new skipchain configuration
+export BC=...
+# Print the skipchain info, note the identity outputer. This is the public key of the first administrator
+bcadmin info
+# Print the admin key, which is stored at the same place specified by BC
+bcadmin key -print path/to/BC/key-ed25519:e65...e30b89e239.cfg
+# Add to the darc the ability to spawn deferred transactions
+bcadmin darc rule -rule spawn:deferred -id <darcID> --identity <adminID>
+# Add to the darc the ability to add signature to deferred transactions
+bcadmin darc rule -rule invoke:deferred.addProof -id <darcID> --identity <adminID>
+# Add to the darc the ability to execute deferred transactions
+bcadmin darc rule -rule invoke:deferred.execProposedTx -id <darcID> --identity <adminID>
+# Add a DARC rule to the genesis darc to spawn a project contract instance
+bcadmin darc rule -rule spawn:project -id <darcID>
+# Add a DARC rule to the genesis darc to update a project contract instance
+bcadmin darc rule -rule spawn:project.update -id <darcID>
+```
+
+To add a threshold rule with bcadmin (for setting up multisignature rules)
+
+```sh
+bcadmin darc rule -rule spawn:project.update -id "threshold<2/3,ed25519:7378d7edf205714e77af5d878ce454464ce0560e3f1633d68fea6dd40bb30238>"
+```
+
+---------
+
+### Setup the app
+
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), and the typescript template.
+
+#### Install all the dependencies
+
+```sh
+npm install
+```
+
+#### Add the correct roster file
+
+You first need to update `/src/services/roster.ts` to the correct roster, which can be found in conode/tmp/public.toml if you followed the instructions above.
+
+<!-- TODO  Add how to store the admin darc ID and the genesis DARC-->
+
+#### npm run start to start the application
+
+```sh
+npm run start
+```
+
+#### Build the project
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```sh
+npm run build
+```
 
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

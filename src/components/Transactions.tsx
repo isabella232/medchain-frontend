@@ -1,117 +1,233 @@
+import { Instruction as InstructionType } from "@dedis/cothority/byzcoin";
 import classnames from "classnames";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState, useContext } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
-import { IoMdCloseCircle } from "react-icons/io";
 import classes from "../classes/classes";
-import { formatHash } from "../tools/format";
+import { ConnectionContext } from "../contexts/ConnectionContext";
+import {
+  byprosQuery,
+  getBlock,
+  getDeferred,
+  sendTransaction,
+} from "../services/cothorityGateway";
+import { hex2Bytes } from "../services/cothorityUtils";
+import {
+  executeDeferredTransaction,
+  signDeferredTransaction,
+} from "../services/instructionBuilder";
+import { DeferredData } from "../services/messages";
+import { AbortButton, ExecuteButton, SignButton } from "./Buttons";
 import PageLayout from "./PageLayout";
-import { SignButton, ExecuteButton } from "../components/Buttons";
+import Pager from "./Pager";
+import PanelElement from "./PanelElement";
+import TransactionModal from "./TransactionModal";
+import DataBody from "@dedis/cothority/byzcoin/proto/data-body";
+import Spinner from "./Spinner";
 
-const transactionsData = {
-  history: [
-    {
-      transactionID:
-        "8effcce9fa8de9f52c0172db38d0be1e2a1a5371a5e4a2fa8e3f4e9499357f3a",
-      instructions: [
-        {
-          hash:
-            "1e74b5dc39d56b40a3c4b8471794effa863d3c1f8c11ff8e864ba243ce56471a",
-          instID:
-            "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-          action: "invoke:value.update",
-          signatures: 0,
-        },
-      ],
-      expireBlockIndex: 54,
-      maxNumExecution: 1,
-      execResults: {},
-    },
-    {
-      transactionID:
-        "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-      instructions: [
-        {
-          hash:
-            "1e74b5dc39d56b40a3c4b8471794effa863d3c1f8c11ff8e864ba243ce56471a",
-          instID:
-            "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-          action: "invoke:value.update",
-          signatures: 0,
-        },
-      ],
-      expireBlockIndex: 54,
-      maxNumExecution: 1,
-      execResults: {},
-    },
-    {
-      transactionID:
-        "8effcce9fa8de9f52c0172db38d0be1e2a1a5371a5e4a2fa8e3f4e9499357f3a",
-      instructions: [
-        {
-          hash:
-            "1e74b5dc39d56b40a3c4b8471794effa863d3c1f8c11ff8e864ba243ce56471a",
-          instID:
-            "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-          action: "invoke:value.update",
-          signatures: 0,
-        },
-      ],
-      expireBlockIndex: 54,
-      maxNumExecution: 1,
-      execResults: {},
-    },
-  ],
-  pending: [
-    {
-      transactionID:
-        "e9b1a4698d0fc49354271df809acadd2ac87f8314b2ee7514c62c3ba1af93c51",
-      instructions: [
-        {
-          hash:
-            "1e74b5dc39d56b40a3c4b8471794effa863d3c1f8c11ff8e864ba243ce56471a",
-          instID:
-            "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-          action: "invoke:value.update",
-          signatures: 0,
-        },
-        {
-          hash:
-            "1e74b5dc39d56b40a3c4b8471794effa863d3c1f8c11ff8e864ba243ce56471a",
-          instID:
-            "2faa782974aece23c57e961e0c767fb7bb56228efedd5eac7b8a6e9b3d058779",
-          action: "invoke:value.update",
-          signatures: 0,
-        },
-      ],
-      expireBlockIndex: 54,
-      maxNumExecution: 1,
-    },
-  ],
-};
+const Instruction: FunctionComponent<{
+  instructionHash: Buffer;
+  instructionData: InstructionType;
+  index: number;
+  instanceID: string;
+  executed?: boolean;
+}> = ({ instructionHash, instructionData, index, instanceID, executed }) => {
+  const { connection, setConnection } = useContext(ConnectionContext);
+  const openSignModal = () => {
+    setIsOpen(true);
+  };
+  const signInstruction = () => {
+    const tx = signDeferredTransaction(
+      connection.private,
+      connection.public,
+      instructionHash,
+      Buffer.from(hex2Bytes(instanceID)),
+      index
+    );
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  };
 
-// TODO Change type
-const TransactionLine: FunctionComponent<{
-  transactionDetails: any;
-  onClick: any;
-  selected?: boolean;
-}> = ({ transactionDetails, onClick, selected }) => {
+  const [modalIsOpen, setIsOpen] = useState(false);
   return (
-    <button
-      className={classnames(
-        "focus:outline-none shadow w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
-        selected && "border-primary-400"
-      )}
-      onClick={onClick}
-    >
-      <span>{formatHash(transactionDetails.transactionID)}</span>
-      <span className="">{`${transactionDetails.instructions[0].action}`}</span>
-      <span className="font-bold">{`${transactionDetails.instructions[0].signatures} signatures`}</span>
-    </button>
+    <div className="">
+      <TransactionModal
+        modalIsOpen={modalIsOpen}
+        setIsOpen={setIsOpen}
+        title="Sign Instruction"
+        executeAction={() => signInstruction()}
+        abortAction={() => setIsOpen(false)}
+      >
+        <PanelElement title="Instruction Hash">
+          <div className="">{instructionHash.toString("hex")}</div>
+        </PanelElement>
+        <PanelElement title="Contract">
+          <div className="">{instructionData.invoke.contractID}</div>
+        </PanelElement>
+        <PanelElement title="Command">
+          <div className="">{instructionData.invoke.command}</div>
+        </PanelElement>
+        <PanelElement title="Signatures" last>
+          <div className="">
+            {instructionData.signerIdentities.length === 0
+              ? "No signature"
+              : instructionData.signerIdentities.map((signer) =>
+                  signer.toString()
+                )}
+          </div>
+        </PanelElement>
+      </TransactionModal>
+      <PanelElement title="Instruction Hash">
+        <div className="">{instructionHash.toString("hex")}</div>
+      </PanelElement>
+      <PanelElement title="Contract">
+        <div className="">{instructionData.invoke.contractID}</div>
+      </PanelElement>
+      <PanelElement title="Command">
+        <div className="">{instructionData.invoke.command}</div>
+      </PanelElement>
+      <PanelElement title="Signatures" last>
+        <div className="">
+          {instructionData.signatures.length == 0
+            ? "No signature"
+            : instructionData.signatures}
+        </div>
+      </PanelElement>
+
+      {!executed && <SignButton onClick={openSignModal} />}
+    </div>
   );
 };
+
+const SelectedTransaction: FunctionComponent<{
+  selectedTransaction: any;
+  setSelectedTransaction: any;
+}> = ({ selectedTransaction, setSelectedTransaction }) => {
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [transactionData, setTransactionData] = useState<DeferredData>();
+  const [executed, setExecuted] = useState<boolean>(false);
+  const { connection } = useContext(ConnectionContext);
+  const executeTransaction = () => {
+    const tx = executeDeferredTransaction(selectedTransaction.instanceid);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  };
+  const openSignModal = () => {
+    setIsOpen(true);
+  };
+  useEffect(() => {
+    setTransactionData(undefined);
+    getDeferred(selectedTransaction.instanceid).then((result) => {
+      console.log(result);
+      setTransactionData(result);
+      if (result.execresult.length !== 0) {
+        setExecuted(true);
+      }
+    });
+    getBlock(0).then((res) =>
+      console.log(DataBody.decode(Buffer.from(res.payload)))
+    );
+  }, [selectedTransaction]);
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-3">
+      <TransactionModal
+        modalIsOpen={modalIsOpen}
+        setIsOpen={setIsOpen}
+        title="Execute Transaction"
+        executeAction={() => executeTransaction()}
+        abortAction={() => setIsOpen(false)}
+      ></TransactionModal>
+      <PanelElement title="Transaction instance ID">
+        {selectedTransaction.instanceid}
+      </PanelElement>
+      {transactionData ? (
+        transactionData.proposedtransaction.instructions.map(
+          (instruction, idx) => {
+            return (
+              <Instruction
+                instructionHash={transactionData?.instructionhashes[idx]}
+                instructionData={instruction}
+                index={idx}
+                instanceID={selectedTransaction.instanceid}
+                executed={executed}
+              />
+            );
+          }
+        )
+      ) : (
+        <Spinner />
+      )}
+      {transactionData && !executed && (
+        <ExecuteButton className="mt-4" onClick={openSignModal} />
+      )}
+    </div>
+  );
+};
+// TODO Change type
+
 const Transactions = () => {
   const [viewIndex, setViewIndex] = useState(0);
-  //   TODO create a tx type
+  const [transactionsData, setTransactionsData] = useState([]);
+  const [transactionsHistoryData, setTransactionsHistoryData] = useState([]);
+
+  useEffect(() => {
+    // getDeferredData('a81b8d76b6a1453728a211c3823afb3b3ff0e572e77358f3ebadd4860f9b68ca')
+    // TODO embed query in file
+    byprosQuery(`SELECT
+    encode(cothority.instruction.contract_iid, 'hex') as instanceid
+  FROM
+    cothority.instruction
+  WHERE
+    cothority.instruction.contract_name = 'deferred' 
+  AND 
+    cothority.instruction.type_id = 2
+  AND
+    cothority.instruction.contract_iid 
+    NOT IN (
+      SELECT 
+        cothority.instruction.contract_iid
+      FROM
+        cothority.instruction
+      INNER JOIN 
+        cothority.transaction 
+      ON
+        cothority.transaction.transaction_id = cothority.instruction.transaction_id
+      WHERE
+        cothority.instruction.type_id = 3
+      AND 
+        cothority.instruction.contract_name = 'deferred'
+      AND 
+        cothority.instruction.Action = 'invoke:deferred.execProposedTx'
+      AND 
+        cothority.transaction.Accepted = TRUE
+    ) `).then((reply) => {
+      setTransactionsData(reply.reverse());
+    });
+    byprosQuery(`SELECT 
+    encode(cothority.instruction.contract_iid,'hex') as instanceid
+  FROM
+    cothority.instruction
+  INNER JOIN 
+    cothority.transaction 
+  ON
+    cothority.transaction.transaction_id = cothority.instruction.transaction_id
+  WHERE
+    cothority.instruction.type_id = 3
+  AND 
+    cothority.instruction.contract_name = 'deferred'
+  AND 
+    cothority.instruction.Action = 'invoke:deferred.execProposedTx'
+  AND 
+    cothority.transaction.Accepted = TRUE`).then((reply) => {
+      setTransactionsHistoryData(reply.reverse());
+    });
+  }, []);
+
   const [selectedTransaction, setSelectedTransaction] = useState<any>();
   return (
     <PageLayout title="Transactions" icon={FaExchangeAlt}>
@@ -142,73 +258,28 @@ const Transactions = () => {
         </button>
       </nav>
       <div className="flex">
-        <div className="w-1/2 p-3 space-y-2">
-          {viewIndex === 0
-            ? transactionsData.pending.map((v) => {
-                return (
-                  <TransactionLine
-                    transactionDetails={v}
-                    onClick={() => setSelectedTransaction(v)}
-                    selected= {selectedTransaction === v}
-                  />
-                );
-              })
-            : transactionsData.history.map((v) => {
-                return (
-                  <TransactionLine
-                    transactionDetails={v}
-                    onClick={() => setSelectedTransaction(v)}
-                    selected= {selectedTransaction === v}
-                  />
-                );
-              })}
+        <div className="w-1/2 p-3">
+          {viewIndex === 0 ? (
+            <Pager
+              data={transactionsData}
+              selectedTransaction={selectedTransaction}
+              setSelectedTransaction={setSelectedTransaction}
+            />
+          ) : (
+            <Pager
+              data={transactionsHistoryData}
+              selectedTransaction={selectedTransaction}
+              setSelectedTransaction={setSelectedTransaction}
+            />
+          )}
         </div>
+
         <div className="w-1/2 p-3">
           {selectedTransaction !== undefined && (
-            <div className="bg-white rounded-lg shadow-lg">
-              <div className="p-3">
-                <button
-                  onClick={() => setSelectedTransaction(undefined)}
-                  className={classnames("text-red-400")}
-                >
-                  <IoMdCloseCircle />
-                </button>
-              </div>
-              <div className="p-3 text-sm">
-                <p className={classnames("mb-2", classes.boxSubtitle)}>
-                  Deferred Transacation
-                </p>
-                <p className="font-bold">Transaction ID</p>
-                {selectedTransaction.transactionID}
-              </div>
-
-              {selectedTransaction.instructions.map(
-                (instruction: any, index: number) => {
-                  return (
-                    <div className="border-t-2 border-gray-300 p-3 text-sm">
-                      <p
-                        className={classnames("mb-2", classes.boxSubtitle)}
-                      >{`Instruction ${index}`}</p>
-                      <p className="font-bold">Instruction hash</p>
-                      <p>{instruction.hash}</p>
-                      <p className="font-bold">Instruction ID</p>
-                      <p>{instruction.instID}</p>
-                      <p className="font-bold">Action</p>
-                      <p>{instruction.action}</p>
-                      <p className="font-bold">Signatures</p>
-                      <p>{instruction.signatures}</p>
-                    </div>
-                  );
-                }
-              )}
-
-              {selectedTransaction.execResults === undefined && (
-                <div className="p-3 flex space-x-3">
-                  <SignButton />
-                  <ExecuteButton />
-                </div>
-              )}
-            </div>
+            <SelectedTransaction
+              selectedTransaction={selectedTransaction}
+              setSelectedTransaction={setSelectedTransaction}
+            />
           )}
         </div>
       </div>

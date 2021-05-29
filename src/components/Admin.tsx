@@ -1,39 +1,218 @@
+import Darc from "@dedis/cothority/darc/darc";
 import classnames from "classnames";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
+import { AiFillEdit, AiFillMinusCircle } from "react-icons/ai";
 import { FaUsers } from "react-icons/fa";
-import classes from "../classes/classes";
-import { ModifyButton } from "./Buttons";
+import { GiConfirmed } from "react-icons/gi";
+import { MdCancel } from "react-icons/md";
+import { ConnectionContext } from "../contexts/ConnectionContext";
+import { getDarc, sendTransaction } from "../services/cothorityGateway";
+import { getAdmins, validateKey } from "../services/cothorityUtils";
+import {
+  addAdmintoDarc,
+  removeFromAdmintoDarc,
+} from "../services/instructionBuilder";
+import { AddButton, ModifyButton } from "./Buttons";
+import Error from "./Error";
 import PageLayout from "./PageLayout";
+import PanelElement from "./PanelElement";
+import Spinner from "./Spinner";
+import Success from "./Success";
+import TransactionModal from "./TransactionModal";
 
-const adminData = {
-  identities: [
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
-    "ed25519:801c813bca03d0d0c09887b0ff87e6fa51fe782cbfca10323ccf88528e5e1b53",
-  ],
-};
-const PanelElement: FunctionComponent<{ title: string; last?: boolean }> = ({
-  title,
-  children,
-  last,
+const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
+  name,
+  darc,
 }) => {
+  const [modifying, setModifying] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const { connection } = useContext(ConnectionContext);
+  const [removeAdminModalOpen, setRemoveAdminModalOpen] = useState(false);
+  const updateKey = () => {
+    setModifying(true);
+  };
+
+  const removeKey = () => {
+    const tx = removeFromAdmintoDarc(darc, name);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+        setRemoveAdminModalOpen(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setRemoveAdminModalOpen(false);
+      });
+  };
+
   return (
-    <div className={classnames("py-3 text-xs", !last && "border-b border-gray-300")}>
-      <h2 className={classnames("mb-2", classes.boxSubtitle)}>{title}</h2>
-      {children}
+    <div className="">
+      <TransactionModal
+        title="Remove Administrator"
+        modalIsOpen={removeAdminModalOpen}
+        setIsOpen={setRemoveAdminModalOpen}
+        executeAction={() => removeKey()}
+        abortAction={() => setRemoveAdminModalOpen(false)}
+      >
+        Remove admin{" "}
+        <span className="font-bold text-primary-400 text-xs">{name}</span> from
+        the Administrator consortium
+      </TransactionModal>
+      {modifying ? (
+        <ModifyAdmin setModifying={setModifying} oldKey={name} />
+      ) : (
+        <div className="flex space-x-2">
+          <p className="">{name}</p>
+
+          <button
+            className={classnames("text-red-400")}
+            onClick={(e) => setRemoveAdminModalOpen(true)}
+          >
+            <AiFillMinusCircle />
+          </button>
+          <button
+            className={classnames("text-primary-400")}
+            onClick={updateKey}
+          >
+            <AiFillEdit />
+          </button>
+        </div>
+      )}
+      {error && <Error message={error} reset={setError} />}
+      {success && <Success message={success} reset={setSuccess} />}
     </div>
   );
 };
 
+const ModifyAdmin: FunctionComponent<{
+  setModifying: React.Dispatch<React.SetStateAction<boolean>>;
+  oldKey: string;
+}> = ({ setModifying, oldKey }) => {
+  const [error, setError] = useState("");
+  const [newKey, setNewKey] = useState("");
+  const abort = () => {
+    setModifying(false);
+    setNewKey("");
+    setError("");
+  };
+
+  const confirm = () => {
+    // TODO call the execution of the transaction modal etc... -> sign tx
+    if (!validateKey(newKey)) {
+      setError("Not a valid public address");
+      return;
+    }
+    setError("");
+  };
+
+  return (
+    <div className="space-y-1">
+      <label className="text-xs ml-1 mb-1">New Key:</label>
+      <div className="flex space-x-2">
+        <input
+          name="field_name"
+          className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+          type="text"
+          placeholder={oldKey}
+          value={newKey}
+          onChange={(e) => setNewKey(e.target.value)}
+        />
+        <button className={classnames("text-green-400")} onClick={confirm}>
+          <GiConfirmed />
+        </button>
+        <button className={classnames("text-red-400")} onClick={abort}>
+          <MdCancel />
+        </button>
+      </div>
+      {error && <Error message={error} reset={setError} />}
+    </div>
+  );
+};
+const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
+  const [showNewAdmin, setShowNewAdmin] = useState(false);
+  const [newKey, setNewKey] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const { connection } = useContext(ConnectionContext);
+
+  const removeKey = () => {
+    // TODO call the transaction modal to remove the admin -> modify darc and remove the admin
+  };
+
+  const abort = () => {
+    setNewKey("");
+    setError("");
+    setShowNewAdmin(false);
+  };
+
+  const confirm = () => {
+    // TODO call the execution of the transaction modal etc... -> sign tx
+    if (!validateKey(newKey)) {
+      setError("Not a valid public address");
+      return;
+    }
+    setError("");
+    console.log("Actual Darc :", darc);
+    const tx = addAdmintoDarc(darc, newKey);
+    console.log("new deff tx :", tx);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return showNewAdmin ? (
+    <div className="">
+      <div className="space-y-1">
+        <label className="text-xs ml-1 mb-1">New Key:</label>
+        <div className="flex space-x-2">
+          <input
+            name="field_name"
+            className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+            type="text"
+            placeholder="ed25519: ..."
+            value={newKey}
+            onChange={(e) => setNewKey(e.target.value)}
+          />
+          <button className={classnames("text-green-400")} onClick={confirm}>
+            <GiConfirmed />
+          </button>
+          <button className={classnames("text-red-400")} onClick={abort}>
+            <MdCancel />
+          </button>
+        </div>
+        {error && <Error message={error} reset={setError} />}
+        {success && <Success message={success} reset={setSuccess} />}
+      </div>
+    </div>
+  ) : (
+    <AddButton onClick={(e) => setShowNewAdmin(true)} />
+  );
+};
+
 const Admin = () => {
+  const [darc, setDarc] = useState<Darc>();
+  const [newAdmin, setNewAdmin] = useState("");
+  const [admins, setAdmins] = useState<string[]>();
+  const [modalIsOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    getDarc().then((darc) => {
+      setDarc(darc);
+      console.log(darc);
+      setAdmins(getAdmins(darc) as string[]);
+    });
+  }, []);
+
   return (
     <PageLayout title="Administrator Consortium" icon={FaUsers}>
-      <div className="w-1/2 p-3">
+      {/* <TransactionModal modalIsOpen={modalIsOpen} setIsOpen={setIsOpen}/> */}
+      <div className="lg:w-1/2 p-3">
         <div className="space-y-3 p-3 bg-white shadow-lg rounded-lg">
           <PanelElement title="BASE Admin DARC ID">
-            <p className="">
-              999b315d2e19ac4e670578e3cd84a95fac2f5e68ad9725bc5e10da9d8cbee419
-            </p>
+            <p className="">{darc?.id || <Spinner />}</p>
           </PanelElement>
           <PanelElement title="Multisignature Policies">
             <div className="">
@@ -44,22 +223,18 @@ const Admin = () => {
           </PanelElement>
           <PanelElement title="DARC Version">
             <div className="">
-              <span className="font-bold mr-1">3</span>
+              {darc ? (
+                <span className="font-bold mr-1">{darc.version.low}</span>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </PanelElement>
           <PanelElement last title="Admininistrators">
-            <div className="">
-              <div className="">
-                {adminData.identities.map((item) => {
-                  return <div>{item}</div>;
-                })}
-              </div>
-              <textarea
-                className="w-full p-2 h-20 border rounded-md mt-2 text-xs"
-                value={adminData.identities.join("\n")}
-              ></textarea>
-              <ModifyButton className="mt-2" />
-            </div>
+            {admins?.map((item) => {
+              return <AdminElem name={item} darc={darc as Darc}></AdminElem>;
+            }) || <Spinner />}
+            <NewAdminElem darc={darc as Darc} />
           </PanelElement>
         </div>
       </div>
