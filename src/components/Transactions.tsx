@@ -43,11 +43,11 @@ const Instruction: FunctionComponent<{
   setSuccess,
   setSelectedTransaction,
 }) => {
-  const { connection, setConnection } = useContext(ConnectionContext);
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const { connection } = useContext(ConnectionContext);
+  const [signModalIsOpen, setSignModal] = useState(false);
   const [signers, setSigners] = useState<string[]>([]);
   const openSignModal = () => {
-    setIsOpen(true);
+    setSignModal(true);
   };
 
   useEffect(() => {
@@ -67,13 +67,13 @@ const Instruction: FunctionComponent<{
     sendTransaction(tx, connection.private)
       .then((res) => {
         console.log(res);
-        setIsOpen(false);
+        setSignModal(false);
         setSuccess(res);
-        setSelectedTransaction(undefined)
+        setSelectedTransaction(undefined);
       })
       .catch((err) => {
         console.log(err);
-        setIsOpen(false);
+        setSignModal(false);
         setError(err);
       });
   };
@@ -81,11 +81,11 @@ const Instruction: FunctionComponent<{
   return (
     <div className="">
       <TransactionModal
-        modalIsOpen={modalIsOpen}
-        setIsOpen={setIsOpen}
+        modalIsOpen={signModalIsOpen}
+        setIsOpen={setSignModal}
         title="Sign Instruction"
         executeAction={() => signInstruction()}
-        abortAction={() => setIsOpen(false)}
+        abortAction={() => setSignModal(false)}
       >
         <PanelElement title="Instruction Hash">
           <div className="">{instructionHash.toString("hex")}</div>
@@ -123,13 +123,14 @@ const Instruction: FunctionComponent<{
         </div>
       </PanelElement>
 
-      {!executed && (!signers.includes(connection.public) ? (
-        <SignButton onClick={openSignModal} />
-      ) : (
-        <span className="text-xs font-bold text-primary-400">
-          You already signed the instruction
-        </span>
-      ))}
+      {!executed &&
+        (!signers.includes(connection.public) ? (
+          <SignButton onClick={openSignModal} />
+        ) : (
+          <span className="text-xs font-bold text-primary-400">
+            You already signed the instruction
+          </span>
+        ))}
     </div>
   );
 };
@@ -138,7 +139,7 @@ const SelectedTransaction: FunctionComponent<{
   selectedTransaction: any;
   setSelectedTransaction: any;
 }> = ({ selectedTransaction, setSelectedTransaction }) => {
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [executeModalIsOpen, setExecuteModal] = useState(false);
   const [transactionData, setTransactionData] = useState<DeferredData>();
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
@@ -149,18 +150,18 @@ const SelectedTransaction: FunctionComponent<{
     sendTransaction(tx, connection.private)
       .then((res) => {
         console.log(res);
-        setIsOpen(false);
+        setExecuteModal(false);
         setSuccess(res);
         setSelectedTransaction(undefined);
       })
       .catch((err) => {
         console.log(err);
-        setIsOpen(false);
+        setExecuteModal(false);
         setError(err.toString());
       });
   };
-  const openSignModal = () => {
-    setIsOpen(true);
+  const openExecuteModal = () => {
+    setExecuteModal(true);
   };
   useEffect(() => {
     setTransactionData(undefined);
@@ -179,11 +180,11 @@ const SelectedTransaction: FunctionComponent<{
   return (
     <div className="bg-white rounded-lg shadow-lg p-3">
       <TransactionModal
-        modalIsOpen={modalIsOpen}
-        setIsOpen={setIsOpen}
+        modalIsOpen={executeModalIsOpen}
+        setIsOpen={setExecuteModal}
         title="Execute Transaction"
         executeAction={() => executeTransaction()}
-        abortAction={() => setIsOpen(false)}
+        abortAction={() => setExecuteModal(false)}
       ></TransactionModal>
       <PanelElement title="Transaction instance ID">
         {selectedTransaction.instanceid}
@@ -210,7 +211,7 @@ const SelectedTransaction: FunctionComponent<{
         <Spinner />
       )}
       {transactionData && !executed && (
-        <ExecuteButton className="mt-4" onClick={openSignModal} />
+        <ExecuteButton className="mt-4" onClick={openExecuteModal} />
       )}
       {error && (
         <Error message={error} reset={setError} title="Transaction failed" />

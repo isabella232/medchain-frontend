@@ -136,10 +136,6 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
   const [success, setSuccess] = useState("");
   const { connection } = useContext(ConnectionContext);
 
-  const removeKey = () => {
-    // TODO call the transaction modal to remove the admin -> modify darc and remove the admin
-  };
-
   const abort = () => {
     setNewKey("");
     setError("");
@@ -194,9 +190,7 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
 
 const Admin = () => {
   const [darc, setDarc] = useState<Darc>();
-  const [newAdmin, setNewAdmin] = useState("");
   const [admins, setAdmins] = useState<string[]>();
-  const [modalIsOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     getDarc().then((darc) => {
@@ -208,7 +202,6 @@ const Admin = () => {
 
   return (
     <PageLayout title="Administrator Consortium" icon={FaUsers}>
-      {/* <TransactionModal modalIsOpen={modalIsOpen} setIsOpen={setIsOpen}/> */}
       <div className="lg:w-1/2 p-3">
         <div className="space-y-3 p-3 bg-white shadow-lg rounded-lg">
           <PanelElement title="BASE Admin DARC ID">
