@@ -6,14 +6,13 @@ import classes from "../classes/classes";
 import { ConnectionContext } from "../contexts/ConnectionContext";
 import {
   byprosQuery,
-
   getDeferred,
-  sendTransaction
+  sendTransaction,
 } from "../services/cothorityGateway";
 import { hex2Bytes } from "../services/cothorityUtils";
 import {
   executeDeferredTransaction,
-  signDeferredTransaction
+  signDeferredTransaction,
 } from "../services/instructionBuilder";
 import { DeferredData } from "../services/messages";
 import { CopyButton, ExecuteButton, SignButton } from "./Buttons";
@@ -31,9 +30,19 @@ const Instruction: FunctionComponent<{
   index: number;
   instanceID: string;
   executed?: boolean;
-  setError:React.Dispatch<React.SetStateAction<string>>
-  setSuccess:React.Dispatch<React.SetStateAction<string>>
-}> = ({ instructionHash, instructionData, index, instanceID, executed,setError,setSuccess }) => {
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedTransaction: any;
+}> = ({
+  instructionHash,
+  instructionData,
+  index,
+  instanceID,
+  executed,
+  setError,
+  setSuccess,
+  setSelectedTransaction,
+}) => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [signers, setSigners] = useState<string[]>([]);
@@ -59,12 +68,13 @@ const Instruction: FunctionComponent<{
       .then((res) => {
         console.log(res);
         setIsOpen(false);
-        setSuccess(res)
+        setSuccess(res);
+        setSelectedTransaction(undefined)
       })
       .catch((err) => {
         console.log(err);
         setIsOpen(false);
-        setError(err)
+        setError(err);
       });
   };
 
@@ -113,13 +123,13 @@ const Instruction: FunctionComponent<{
         </div>
       </PanelElement>
 
-      {!executed && !signers.includes(connection.public) ? (
+      {!executed && (!signers.includes(connection.public) ? (
         <SignButton onClick={openSignModal} />
       ) : (
         <span className="text-xs font-bold text-primary-400">
           You already signed the instruction
         </span>
-      )}
+      ))}
     </div>
   );
 };
@@ -140,12 +150,13 @@ const SelectedTransaction: FunctionComponent<{
       .then((res) => {
         console.log(res);
         setIsOpen(false);
-        setSuccess(res)
+        setSuccess(res);
+        setSelectedTransaction(undefined);
       })
       .catch((err) => {
         console.log(err);
         setIsOpen(false);
-        setError(err.toString())
+        setError(err.toString());
       });
   };
   const openSignModal = () => {
@@ -190,6 +201,7 @@ const SelectedTransaction: FunctionComponent<{
                 executed={executed}
                 setSuccess={setSuccess}
                 setError={setError}
+                setSelectedTransaction={setSelectedTransaction}
               />
             );
           }
@@ -200,8 +212,16 @@ const SelectedTransaction: FunctionComponent<{
       {transactionData && !executed && (
         <ExecuteButton className="mt-4" onClick={openSignModal} />
       )}
-      {error && <Error message={error} reset={setError} title="Transaction failed" />}
-      {success && <Success message={success} reset={setSuccess} title="Transaction successfully executed"/>}
+      {error && (
+        <Error message={error} reset={setError} title="Transaction failed" />
+      )}
+      {success && (
+        <Success
+          message={success}
+          reset={setSuccess}
+          title="Transaction successfully executed"
+        />
+      )}
     </div>
   );
 };

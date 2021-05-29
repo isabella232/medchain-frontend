@@ -31,7 +31,7 @@ export const removeFromAdmintoDarc = (darc: Darc, admin: string) => {
   admins = arrayRemove(admins as string[], admin);
   console.log(admins);
   const op = "|";
-  const expr = Buffer.from(`${admins?.join("|")}${op}${admin}`);
+  const expr = Buffer.from(`${admins?.join("|")}`);
   newDarc.rules.setRuleExp("_sign", expr);
   const tx = createDarcEvolveInstruction(newDarc);
   return createDeferredTransaction(tx);
