@@ -12,7 +12,7 @@ import {
   addAdmintoDarc,
   removeFromAdmintoDarc,
 } from "../services/instructionBuilder";
-import { AddButton, ModifyButton } from "./Buttons";
+import { AddButton, ModifyButton, CopyButton } from "./Buttons";
 import Error from "./Error";
 import PageLayout from "./PageLayout";
 import PanelElement from "./PanelElement";
@@ -77,6 +77,7 @@ const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
           >
             <AiFillEdit />
           </button>
+          <CopyButton elem={name}/>
         </div>
       )}
       {error && <Error message={error} reset={setError} />}
@@ -212,7 +213,14 @@ const Admin = () => {
       <div className="lg:w-1/2 p-3">
         <div className="space-y-3 p-3 bg-white shadow-lg rounded-lg">
           <PanelElement title="BASE Admin DARC ID">
-            <p className="">{darc?.id || <Spinner />}</p>
+            {darc ? (
+              <div className="flex space-x-2">
+                <span className="">{darc?.id.toString("hex")}</span>
+                <CopyButton elem={darc?.id.toString("hex") as string} />
+              </div>
+            ) : (
+              <Spinner />
+            )}
           </PanelElement>
           <PanelElement title="Multisignature Policies">
             <div className="">

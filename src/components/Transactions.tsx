@@ -16,7 +16,7 @@ import {
   signDeferredTransaction,
 } from "../services/instructionBuilder";
 import { DeferredData } from "../services/messages";
-import { AbortButton, ExecuteButton, SignButton } from "./Buttons";
+import { AbortButton, ExecuteButton, SignButton, CopyButton } from "./Buttons";
 import PageLayout from "./PageLayout";
 import Pager from "./Pager";
 import PanelElement from "./PanelElement";
@@ -80,7 +80,7 @@ const Instruction: FunctionComponent<{
         </PanelElement>
       </TransactionModal>
       <PanelElement title="Instruction Hash">
-        <div className="">{instructionHash.toString("hex")}</div>
+      {instructionHash.toString("hex")} <CopyButton elem={instructionHash.toString("hex")}/>
       </PanelElement>
       <PanelElement title="Contract">
         <div className="">{instructionData.invoke.contractID}</div>
@@ -129,9 +129,10 @@ const SelectedTransaction: FunctionComponent<{
         setExecuted(true);
       }
     });
-    getBlock(0).then((res) =>
-      console.log(DataBody.decode(Buffer.from(res.payload)))
-    );
+    // TODO implement transaction timestamp
+    // getBlock().then((res) =>
+    //   console.log(DataBody.decode(Buffer.from(res.payload)))
+    // );
   }, [selectedTransaction]);
   return (
     <div className="bg-white rounded-lg shadow-lg p-3">
@@ -143,7 +144,8 @@ const SelectedTransaction: FunctionComponent<{
         abortAction={() => setIsOpen(false)}
       ></TransactionModal>
       <PanelElement title="Transaction instance ID">
-        {selectedTransaction.instanceid}
+        {selectedTransaction.instanceid}  
+        <CopyButton elem={selectedTransaction.instanceid}/>
       </PanelElement>
       {transactionData ? (
         transactionData.proposedtransaction.instructions.map(
