@@ -1,28 +1,29 @@
 import { Instruction as InstructionType } from "@dedis/cothority/byzcoin";
 import classnames from "classnames";
-import { FunctionComponent, useEffect, useState, useContext } from "react";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import classes from "../classes/classes";
 import { ConnectionContext } from "../contexts/ConnectionContext";
 import {
   byprosQuery,
-  getBlock,
+
   getDeferred,
-  sendTransaction,
+  sendTransaction
 } from "../services/cothorityGateway";
 import { hex2Bytes } from "../services/cothorityUtils";
 import {
   executeDeferredTransaction,
-  signDeferredTransaction,
+  signDeferredTransaction
 } from "../services/instructionBuilder";
 import { DeferredData } from "../services/messages";
-import { AbortButton, ExecuteButton, SignButton, CopyButton } from "./Buttons";
+import { CopyButton, ExecuteButton, SignButton } from "./Buttons";
+import Error from "./Error";
 import PageLayout from "./PageLayout";
 import Pager from "./Pager";
 import PanelElement from "./PanelElement";
-import TransactionModal from "./TransactionModal";
-import DataBody from "@dedis/cothority/byzcoin/proto/data-body";
 import Spinner from "./Spinner";
+import Success from "./Success";
+import TransactionModal from "./TransactionModal";
 
 const Instruction: FunctionComponent<{
   instructionHash: Buffer;
@@ -30,7 +31,9 @@ const Instruction: FunctionComponent<{
   index: number;
   instanceID: string;
   executed?: boolean;
-}> = ({ instructionHash, instructionData, index, instanceID, executed }) => {
+  setError:React.Dispatch<React.SetStateAction<string>>
+  setSuccess:React.Dispatch<React.SetStateAction<string>>
+}> = ({ instructionHash, instructionData, index, instanceID, executed,setError,setSuccess }) => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [signers, setSigners] = useState<string[]>([]);
@@ -56,10 +59,12 @@ const Instruction: FunctionComponent<{
       .then((res) => {
         console.log(res);
         setIsOpen(false);
+        setSuccess(res)
       })
       .catch((err) => {
         console.log(err);
         setIsOpen(false);
+        setError(err)
       });
   };
 
@@ -111,7 +116,9 @@ const Instruction: FunctionComponent<{
       {!executed && !signers.includes(connection.public) ? (
         <SignButton onClick={openSignModal} />
       ) : (
-        <span className="text-xs font-bold text-primary-400">You already signed the instruction</span>
+        <span className="text-xs font-bold text-primary-400">
+          You already signed the instruction
+        </span>
       )}
     </div>
   );
@@ -125,17 +132,20 @@ const SelectedTransaction: FunctionComponent<{
   const [transactionData, setTransactionData] = useState<DeferredData>();
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
-
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const executeTransaction = () => {
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
     sendTransaction(tx, connection.private)
       .then((res) => {
         console.log(res);
         setIsOpen(false);
+        setSuccess(res)
       })
       .catch((err) => {
         console.log(err);
         setIsOpen(false);
+        setError(err.toString())
       });
   };
   const openSignModal = () => {
@@ -178,6 +188,8 @@ const SelectedTransaction: FunctionComponent<{
                 index={idx}
                 instanceID={selectedTransaction.instanceid}
                 executed={executed}
+                setSuccess={setSuccess}
+                setError={setError}
               />
             );
           }
@@ -188,6 +200,8 @@ const SelectedTransaction: FunctionComponent<{
       {transactionData && !executed && (
         <ExecuteButton className="mt-4" onClick={openSignModal} />
       )}
+      {error && <Error message={error} reset={setError} title="Transaction failed" />}
+      {success && <Success message={success} reset={setSuccess} title="Transaction successfully executed"/>}
     </div>
   );
 };

@@ -13,10 +13,10 @@ import {
   removeFromAdmintoDarc,
 } from "../services/instructionBuilder";
 import { AddButton, ModifyButton, CopyButton } from "./Buttons";
-import Error from "./Error";
 import PageLayout from "./PageLayout";
 import PanelElement from "./PanelElement";
 import Spinner from "./Spinner";
+import Error from "./Error";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
@@ -80,8 +80,8 @@ const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
           <CopyButton elem={name}/>
         </div>
       )}
-      {error && <Error message={error} reset={setError} />}
-      {success && <Success message={success} reset={setSuccess} />}
+      {error && <Error message={error} reset={setError} title="Transaction failed" />}
+      {success && <Success message={success} reset={setSuccess} title="Transaction submitted"/>}
     </div>
   );
 };
@@ -126,7 +126,6 @@ const ModifyAdmin: FunctionComponent<{
           <MdCancel />
         </button>
       </div>
-      {error && <Error message={error} reset={setError} />}
     </div>
   );
 };
@@ -184,8 +183,8 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
             <MdCancel />
           </button>
         </div>
-        {error && <Error message={error} reset={setError} />}
-        {success && <Success message={success} reset={setSuccess} />}
+        {error && <Error message={error} reset={setError} title="Transaction failed"/>}
+        {success && <Success message={success} reset={setSuccess} title="Transaction submitted"/>}
       </div>
     </div>
   ) : (
