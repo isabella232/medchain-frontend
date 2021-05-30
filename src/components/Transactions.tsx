@@ -174,6 +174,7 @@ const SelectedTransaction: FunctionComponent<{
         setExecuted(true);
       }
     });
+
     // TODO implement transaction timestamp
     // getBlock().then((res) =>
     //   console.log(DataBody.decode(Buffer.from(res.payload)))
@@ -218,18 +219,11 @@ const SelectedTransaction: FunctionComponent<{
       {error && (
         <Error message={error} reset={setError} title="Transaction failed" />
       )}
-      {/* {success && (
-        <Success
-          message={success}
-          reset={setSuccess}
-          title="Transaction successfully executed"
-        />
-      )} */}
     </div>
   );
 };
-// TODO Change type
 
+// TODO Change type
 const Transactions = () => {
   const [viewIndex, setViewIndex] = useState(0);
   const [transactionsData, setTransactionsData] = useState([]);

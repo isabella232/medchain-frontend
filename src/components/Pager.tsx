@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import { FunctionComponent, useEffect, useState } from "react";
 import { NextButton, PreviousButton } from "../components/Buttons";
+import { ProjectContract } from "../services/messages";
 import { formatHash } from "../tools/format";
 
 const TransactionLine: FunctionComponent<{
@@ -53,6 +54,64 @@ const Pager: FunctionComponent<{
             selected={selectedTransaction === v}
           />
         );
+      })}
+      <div className="space-x-2 flex mt-4">
+        <PreviousButton onClick={(e) => previousPage()} />
+        <NextButton onClick={(e) => nextPage()} />
+      </div>
+    </div>
+  );
+};
+
+const ProjectLine: FunctionComponent<{
+  projectDetails: any;
+  onClick: any;
+  selected?: boolean;
+}> = ({ projectDetails, onClick, selected }) => {
+  return (
+    <button
+      className={classnames(
+        "focus:outline-none shadow w-full px-8 py-2 rounded-lg text-xs hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
+        selected && "border-primary-400"
+      )}
+      onClick={onClick}
+    >
+      <span>{projectDetails.project.name}</span>
+    </button>
+  );
+};
+
+export const ProjectsPager: FunctionComponent<{
+  data: any[];
+  setSelectedProject: any;
+  selectedProject: any;
+}> = ({ data, setSelectedProject, selectedProject }) => {
+  const [page, setPage] = useState(0);
+  const [maxPage, setMaxPage] = useState(0);
+
+  useEffect(() => {
+    console.log(data)
+    setMaxPage(Math.floor(data.length / 10));
+  }, [data, page]);
+  const nextPage = () => {
+    if (page < maxPage) {
+      setPage(page + 1);
+    }
+  };
+  const previousPage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {data?.slice(10 * page, 10 * page + 10).map((v: any) => {
+        return <ProjectLine
+          projectDetails={v}
+          onClick={() => setSelectedProject(v)}
+          selected={selectedProject === v}
+        />;
       })}
       <div className="space-x-2 flex mt-4">
         <PreviousButton onClick={(e) => previousPage()} />

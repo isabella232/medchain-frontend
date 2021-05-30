@@ -1,0 +1,22 @@
+syntax = "proto2";
+package contracts;
+
+option java_package = "ch.epfl.dedis.lib.proto";
+option java_outer_classname = "project";
+
+message ProjectContract {
+    required string name = 1;
+    required string description = 2;
+    required Authorizations authorizations = 3;
+}
+
+message Authorizations {
+    repeated Authorization authorizations = 1;
+}
+
+message Authorization {
+    required string userID = 1;
+    repeated string queryTerms = 2;
+}
+
+
