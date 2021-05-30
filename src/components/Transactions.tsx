@@ -138,13 +138,15 @@ const Instruction: FunctionComponent<{
 const SelectedTransaction: FunctionComponent<{
   selectedTransaction: any;
   setSelectedTransaction: any;
-}> = ({ selectedTransaction, setSelectedTransaction }) => {
+  success: any,
+  setSuccess:any
+}> = ({ selectedTransaction, setSelectedTransaction, success, setSuccess }) => {
   const [executeModalIsOpen, setExecuteModal] = useState(false);
   const [transactionData, setTransactionData] = useState<DeferredData>();
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+
   const executeTransaction = () => {
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
     sendTransaction(tx, connection.private)
@@ -162,7 +164,7 @@ const SelectedTransaction: FunctionComponent<{
   };
   const openExecuteModal = () => {
     setExecuteModal(true);
-  };
+  }; 
   useEffect(() => {
     setTransactionData(undefined);
     getDeferred(selectedTransaction.instanceid).then((result) => {
@@ -216,13 +218,13 @@ const SelectedTransaction: FunctionComponent<{
       {error && (
         <Error message={error} reset={setError} title="Transaction failed" />
       )}
-      {success && (
+      {/* {success && (
         <Success
           message={success}
           reset={setSuccess}
           title="Transaction successfully executed"
         />
-      )}
+      )} */}
     </div>
   );
 };
@@ -232,7 +234,7 @@ const Transactions = () => {
   const [viewIndex, setViewIndex] = useState(0);
   const [transactionsData, setTransactionsData] = useState([]);
   const [transactionsHistoryData, setTransactionsHistoryData] = useState([]);
-
+  const [success, setSuccess] = useState("");
   useEffect(() => {
     // getDeferredData('a81b8d76b6a1453728a211c3823afb3b3ff0e572e77358f3ebadd4860f9b68ca')
     // TODO embed query in file
@@ -284,7 +286,8 @@ const Transactions = () => {
     cothority.transaction.Accepted = TRUE`).then((reply) => {
       setTransactionsHistoryData(reply.reverse());
     });
-  }, []);
+    console.log(success)
+  }, [success]);
 
   const [selectedTransaction, setSelectedTransaction] = useState<any>();
   return (
@@ -316,7 +319,7 @@ const Transactions = () => {
         </button>
       </nav>
       <div className="flex">
-        <div className="w-1/2 p-3">
+        <div className="xl:w-1/2 w-full p-3">
           {viewIndex === 0 ? (
             <Pager
               data={transactionsData}
@@ -332,15 +335,24 @@ const Transactions = () => {
           )}
         </div>
 
-        <div className="w-1/2 p-3">
+        <div className="xl:w-1/2 w-full p-3">
           {selectedTransaction !== undefined && (
             <SelectedTransaction
               selectedTransaction={selectedTransaction}
               setSelectedTransaction={setSelectedTransaction}
+              success={success}
+              setSuccess={setSuccess}
             />
           )}
         </div>
       </div>
+      {success && (
+          <Success
+            message={success}
+            reset={setSuccess}
+            title="Transaction submitted"
+          />
+        )}
     </PageLayout>
   );
 };

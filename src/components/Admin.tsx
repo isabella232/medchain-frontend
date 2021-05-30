@@ -20,6 +20,7 @@ import Error from "./Error";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
+
 const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
   name,
   darc,
@@ -77,11 +78,19 @@ const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
           >
             <AiFillEdit />
           </button>
-          <CopyButton elem={name}/>
+          <CopyButton elem={name} />
         </div>
       )}
-      {error && <Error message={error} reset={setError} title="Transaction failed" />}
-      {success && <Success message={success} reset={setSuccess} title="Transaction submitted"/>}
+      {error && (
+        <Error message={error} reset={setError} title="Transaction failed" />
+      )}
+      {success && (
+        <Success
+          message={success}
+          reset={setSuccess}
+          title="Transaction submitted"
+        />
+      )}
     </div>
   );
 };
@@ -179,8 +188,16 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
             <MdCancel />
           </button>
         </div>
-        {error && <Error message={error} reset={setError} title="Transaction failed"/>}
-        {success && <Success message={success} reset={setSuccess} title="Transaction submitted"/>}
+        {error && (
+          <Error message={error} reset={setError} title="Transaction failed" />
+        )}
+        {success && (
+          <Success
+            message={success}
+            reset={setSuccess}
+            title="Transaction submitted"
+          />
+        )}
       </div>
     </div>
   ) : (
@@ -202,7 +219,7 @@ const Admin = () => {
 
   return (
     <PageLayout title="Administrator Consortium" icon={FaUsers}>
-      <div className="lg:w-1/2 p-3">
+      <div className="xl:w-1/2 p-3">
         <div className="space-y-3 p-3 bg-white shadow-lg rounded-lg">
           <PanelElement title="BASE Admin DARC ID">
             {darc ? (
