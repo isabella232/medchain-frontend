@@ -4,14 +4,13 @@ import { MdCancel } from "react-icons/md";
 
 const Success: FunctionComponent<{
   title: string;
-  message: string;
-  reset: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ title, message, reset }) => {
-  const [enter, setEnter] = useState(false);
+  success: string;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ title, success, setSuccess }) => {
+  const [message, setMessage] = useState("");
   useEffect(() => {
-    setEnter(true);
-    return () => reset("")
-  }, [message,title]);
+    setMessage(success)
+  }, [title, success]);
   return (
     <div className="overflow-hidden absolute right-0 top-10">
       <div
@@ -19,13 +18,13 @@ const Success: FunctionComponent<{
           "bg-green-100 text-green-600 rounded-lg text-sm py-1 px-2 capitalize mr-4",
           "transition duration-1000 ease-in-out",
           // "-translate-x-full",
-          !enter && "transform translate-x-full opacity-0"
+          !(success.length>0) && "transform translate-x-full opacity-0"
         )}
       >
         <div className="text-red-400 flex">
           <button
             onClick={(e) => {
-              setEnter(false);
+              setSuccess("");
             }}
           >
             <MdCancel />

@@ -20,14 +20,15 @@ import Error from "./Error";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
-
-const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
-  name,
-  darc,
-}) => {
+const AdminElem: FunctionComponent<{
+  name: string;
+  darc: Darc;
+  success: string;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ name, darc, success, setSuccess }) => {
   const [modifying, setModifying] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+
   const { connection } = useContext(ConnectionContext);
   const [removeAdminModalOpen, setRemoveAdminModalOpen] = useState(false);
   const updateKey = () => {
@@ -84,13 +85,6 @@ const AdminElem: FunctionComponent<{ name: string; darc: Darc }> = ({
       {error && (
         <Error message={error} reset={setError} title="Transaction failed" />
       )}
-      {success && (
-        <Success
-          message={success}
-          reset={setSuccess}
-          title="Transaction submitted"
-        />
-      )}
     </div>
   );
 };
@@ -138,11 +132,14 @@ const ModifyAdmin: FunctionComponent<{
     </div>
   );
 };
-const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
+const NewAdminElem: FunctionComponent<{
+  darc: Darc;
+  success: string;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ darc, success, setSuccess }) => {
   const [showNewAdmin, setShowNewAdmin] = useState(false);
   const [newKey, setNewKey] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const { connection } = useContext(ConnectionContext);
 
   const abort = () => {
@@ -191,13 +188,6 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
         {error && (
           <Error message={error} reset={setError} title="Transaction failed" />
         )}
-        {success && (
-          <Success
-            message={success}
-            reset={setSuccess}
-            title="Transaction submitted"
-          />
-        )}
       </div>
     </div>
   ) : (
@@ -208,6 +198,7 @@ const NewAdminElem: FunctionComponent<{ darc: Darc }> = ({ darc }) => {
 const Admin = () => {
   const [darc, setDarc] = useState<Darc>();
   const [admins, setAdmins] = useState<string[]>();
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     getDarc().then((darc) => {
@@ -215,7 +206,7 @@ const Admin = () => {
       console.log(darc);
       setAdmins(getAdmins(darc) as string[]);
     });
-  }, []);
+  }, [success]);
 
   return (
     <PageLayout title="Administrator Consortium" icon={FaUsers}>
@@ -249,12 +240,28 @@ const Admin = () => {
           </PanelElement>
           <PanelElement last title="Admininistrators">
             {admins?.map((item) => {
-              return <AdminElem name={item} darc={darc as Darc}></AdminElem>;
+              return (
+                <AdminElem
+                  name={item}
+                  darc={darc as Darc}
+                  success={success}
+                  setSuccess={setSuccess}
+                ></AdminElem>
+              );
             }) || <Spinner />}
-            <NewAdminElem darc={darc as Darc} />
+            <NewAdminElem
+              darc={darc as Darc}
+              success={success}
+              setSuccess={setSuccess}
+            />
           </PanelElement>
         </div>
       </div>
+      <Success
+        success={success}
+        setSuccess={setSuccess}
+        title="Transaction submitted"
+      />
     </PageLayout>
   );
 };

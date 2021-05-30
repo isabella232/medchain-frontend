@@ -138,8 +138,8 @@ const Instruction: FunctionComponent<{
 const SelectedTransaction: FunctionComponent<{
   selectedTransaction: any;
   setSelectedTransaction: any;
-  success: any,
-  setSuccess:any
+  success: any;
+  setSuccess: any;
 }> = ({ selectedTransaction, setSelectedTransaction, success, setSuccess }) => {
   const [executeModalIsOpen, setExecuteModal] = useState(false);
   const [transactionData, setTransactionData] = useState<DeferredData>();
@@ -164,7 +164,7 @@ const SelectedTransaction: FunctionComponent<{
   };
   const openExecuteModal = () => {
     setExecuteModal(true);
-  }; 
+  };
   useEffect(() => {
     setTransactionData(undefined);
     getDeferred(selectedTransaction.instanceid).then((result) => {
@@ -286,7 +286,7 @@ const Transactions = () => {
     cothority.transaction.Accepted = TRUE`).then((reply) => {
       setTransactionsHistoryData(reply.reverse());
     });
-    console.log(success)
+    console.log(success);
   }, [success]);
 
   const [selectedTransaction, setSelectedTransaction] = useState<any>();
@@ -346,13 +346,12 @@ const Transactions = () => {
           )}
         </div>
       </div>
-      {success && (
-          <Success
-            message={success}
-            reset={setSuccess}
-            title="Transaction submitted"
-          />
-        )}
+
+      <Success
+        success={success}
+        setSuccess={setSuccess}
+        title="Transaction submitted"
+      />
     </PageLayout>
   );
 };
