@@ -59,7 +59,6 @@ const Instruction: FunctionComponent<{
   const signInstruction = () => {
     const tx = signDeferredTransaction(
       connection.private,
-      connection.public,
       instructionHash,
       Buffer.from(hex2Bytes(instanceID)),
       index
@@ -119,7 +118,9 @@ const Instruction: FunctionComponent<{
         last
       >
         <div className="">
-          {instructionData.signatures.length == 0 ? "No signature" : signers}
+          {instructionData.signatures.length == 0 ? "No signature" : signers.map(signer => {
+            return <div>{signer}</div>
+          } )}
         </div>
       </PanelElement>
 
