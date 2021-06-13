@@ -10,13 +10,13 @@ import { getDarc, sendTransaction } from "../services/cothorityGateway";
 import {
   getAdmins,
   getMultiSigRule,
-  validateKey
+  validateKey,
 } from "../services/cothorityUtils";
 import {
   addAdmintoDarc,
   changeThresholdFromDarc,
   modifyAdminFromDarc,
-  removeAdminFromDarc
+  removeAdminFromDarc,
 } from "../services/instructionBuilder";
 import { AddButton, CopyButton, ModifyButton } from "./Buttons";
 import Error from "./Error";
@@ -178,7 +178,7 @@ const ModifyMultisigRule: FunctionComponent<{
   useEffect(() => {
     const rule = getMultiSigRule(darc);
     if (rule !== null) setRule(rule);
-  }, []);
+  }, [darc, rule]);
 
   const confirm = () => {
     const tx = changeThresholdFromDarc(darc, newRule);
@@ -214,12 +214,14 @@ const ModifyMultisigRule: FunctionComponent<{
         )}
       </div>
     </>
-  ) : (
+  ) : rule ? (
     <>
       <span className="font-bold mr-1">{rule}</span>
-      {rule && <span>of signers</span>}
+      <span>of signers</span>
       <ModifyButton onClick={(e) => setShowNewRule(true)} className="mt-2" />
     </>
+  ) : (
+    <></>
   );
 };
 
@@ -341,10 +343,7 @@ const Admin = () => {
                 ></AdminElem>
               );
             }) || <Spinner />}
-            <NewAdminElem
-              darc={darc as Darc}
-              setSuccess={setSuccess}
-            />
+            <NewAdminElem darc={darc as Darc} setSuccess={setSuccess} />
           </PanelElement>
         </div>
       </div>
