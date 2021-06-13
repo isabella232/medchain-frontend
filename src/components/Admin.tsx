@@ -7,11 +7,16 @@ import { GiConfirmed } from "react-icons/gi";
 import { MdCancel } from "react-icons/md";
 import { ConnectionContext } from "../contexts/ConnectionContext";
 import { getDarc, sendTransaction } from "../services/cothorityGateway";
-import { getAdmins, validateKey } from "../services/cothorityUtils";
+import {
+  getAdmins,
+  getMultiSigRule,
+  validateKey
+} from "../services/cothorityUtils";
 import {
   addAdmintoDarc,
+  changeThresholdFromDarc,
   modifyAdminFromDarc,
-  removeAdminFromDarc,
+  removeAdminFromDarc
 } from "../services/instructionBuilder";
 import { AddButton, CopyButton, ModifyButton } from "./Buttons";
 import Error from "./Error";
@@ -21,12 +26,14 @@ import Spinner from "./Spinner";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
+/**
+ * Represent a single admin line in the administration darc panel
+ */
 const AdminElem: FunctionComponent<{
   name: string;
   darc: Darc;
-  success: string;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ name, darc, success, setSuccess }) => {
+}> = ({ name, darc, setSuccess }) => {
   const [modifying, setModifying] = useState(false);
   const [error, setError] = useState("");
 
@@ -48,21 +55,9 @@ const AdminElem: FunctionComponent<{
         setRemoveAdminModalOpen(false);
       });
   };
-  // const modifyKey = () => {
-  //   const tx = modifyAdminFromDarc(darc, name);
-  //   sendTransaction(tx, connection.private)
-  //     .then((res) => {
-  //       setSuccess(res);
-  //       setRemoveAdminModalOpen(false);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       setRemoveAdminModalOpen(false);
-  //     });
-  // };
 
   return (
-    <div className="">
+    <>
       <TransactionModal
         title="Remove Administrator"
         modalIsOpen={removeAdminModalOpen}
@@ -70,16 +65,20 @@ const AdminElem: FunctionComponent<{
         executeAction={() => removeKey()}
         abortAction={() => setRemoveAdminModalOpen(false)}
       >
-        Remove admin{" "}
+        Remove admin
         <span className="font-bold text-primary-400 text-xs">{name}</span> from
         the Administrator consortium
       </TransactionModal>
       {modifying ? (
-        <ModifyAdmin setModifying={setModifying} setSuccess={setSuccess} oldKey={name} darc={darc} />
+        <ModifyAdmin
+          setModifying={setModifying}
+          setSuccess={setSuccess}
+          oldKey={name}
+          darc={darc}
+        />
       ) : (
         <div className="flex space-x-2">
-          <p className="">{name}</p>
-
+          <p>{name}</p>
           <button
             className={classnames("text-red-400")}
             onClick={(e) => setRemoveAdminModalOpen(true)}
@@ -98,10 +97,13 @@ const AdminElem: FunctionComponent<{
       {error && (
         <Error message={error} reset={setError} title="Transaction failed" />
       )}
-    </div>
+    </>
   );
 };
 
+/**
+ * Display the input field to modify an administrator key in the administration darc
+ */
 const ModifyAdmin: FunctionComponent<{
   setModifying: React.Dispatch<React.SetStateAction<boolean>>;
   oldKey: string;
@@ -153,11 +155,81 @@ const ModifyAdmin: FunctionComponent<{
     </div>
   );
 };
+
+/**
+ * The multisignature rule component of the administration panel
+ */
+const ModifyMultisigRule: FunctionComponent<{
+  darc: Darc;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ darc, setSuccess }) => {
+  const [showNewRule, setShowNewRule] = useState(false);
+  const [rule, setRule] = useState("");
+  const [newRule, setNewRule] = useState("");
+  const [error, setError] = useState("");
+  const { connection } = useContext(ConnectionContext);
+
+  const abort = () => {
+    setNewRule("");
+    setError("");
+    setShowNewRule(false);
+  };
+
+  useEffect(() => {
+    const rule = getMultiSigRule(darc);
+    if (rule !== null) setRule(rule);
+  }, []);
+
+  const confirm = () => {
+    const tx = changeThresholdFromDarc(darc, newRule);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return showNewRule ? (
+    <>
+      <div className="space-y-1">
+        <label className="text-xs ml-1 mb-1">New Rule:</label>
+        <div className="flex space-x-2">
+          <input
+            name="field_name"
+            className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+            type="text"
+            placeholder="2/3"
+            value={newRule}
+            onChange={(e) => setNewRule(e.target.value)}
+          />
+          <button className={classnames("text-green-400")} onClick={confirm}>
+            <GiConfirmed />
+          </button>
+          <button className={classnames("text-red-400")} onClick={abort}>
+            <MdCancel />
+          </button>
+        </div>
+        {error && (
+          <Error message={error} reset={setError} title="Transaction failed" />
+        )}
+      </div>
+    </>
+  ) : (
+    <>
+      <span className="font-bold mr-1">{rule}</span>
+      {rule && <span>of signers</span>}
+      <ModifyButton onClick={(e) => setShowNewRule(true)} className="mt-2" />
+    </>
+  );
+};
+
+/**
+ * Display the input to add a new administrator key in the consortium
+ */
 const NewAdminElem: FunctionComponent<{
   darc: Darc;
-  success: string;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ darc, success, setSuccess }) => {
+}> = ({ darc, setSuccess }) => {
   const [showNewAdmin, setShowNewAdmin] = useState(false);
   const [newKey, setNewKey] = useState("");
   const [error, setError] = useState("");
@@ -170,7 +242,6 @@ const NewAdminElem: FunctionComponent<{
   };
 
   const confirm = () => {
-    // TODO call the execution of the transaction modal etc... -> sign tx
     if (!validateKey(newKey)) {
       setError("Not a valid public address");
       return;
@@ -185,7 +256,7 @@ const NewAdminElem: FunctionComponent<{
   };
 
   return showNewAdmin ? (
-    <div className="">
+    <>
       <div className="space-y-1">
         <label className="text-xs ml-1 mb-1">New Key:</label>
         <div className="flex space-x-2">
@@ -208,23 +279,21 @@ const NewAdminElem: FunctionComponent<{
           <Error message={error} reset={setError} title="Transaction failed" />
         )}
       </div>
-    </div>
+    </>
   ) : (
     <AddButton onClick={(e) => setShowNewAdmin(true)} />
   );
 };
 
+/**
+ * The component for the administrator page of the application
+ */
 const Admin = () => {
   const [darc, setDarc] = useState<Darc>();
   const [admins, setAdmins] = useState<string[]>();
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // TODO add the true rules for the administration darc -
-    // evolve DARC tresh,
-    // spawn project tresh
-    // update - remove invoke on project tresh
-    // Deferred - 1 admin
     getDarc().then((darc) => {
       setDarc(darc);
       console.log(darc);
@@ -239,7 +308,7 @@ const Admin = () => {
           <PanelElement title="BASE Admin DARC ID">
             {darc ? (
               <div className="flex space-x-2">
-                <span className="">{darc?.id.toString("hex")}</span>
+                <span>{darc?.id.toString("hex")}</span>
                 <CopyButton elem={darc?.id.toString("hex") as string} />
               </div>
             ) : (
@@ -247,21 +316,20 @@ const Admin = () => {
             )}
           </PanelElement>
           <PanelElement title="Multisignature Policies">
-            {/* TODO modify the threshold policy by replicating the DARC and just changing the threshold */}
-            <div className="">
-              <span className="font-bold mr-1">2/3</span>
-              <span>of signers</span>
-              <ModifyButton className="mt-2" />
-            </div>
+            {darc ? (
+              <ModifyMultisigRule darc={darc as Darc} setSuccess={setSuccess} />
+            ) : (
+              <Spinner />
+            )}
           </PanelElement>
           <PanelElement title="DARC Version">
-            <div className="">
+            <>
               {darc ? (
                 <span className="font-bold mr-1">{darc.version.low}</span>
               ) : (
                 <Spinner />
               )}
-            </div>
+            </>
           </PanelElement>
           <PanelElement last title="Admininistrators">
             {admins?.map((item) => {
@@ -269,14 +337,12 @@ const Admin = () => {
                 <AdminElem
                   name={item}
                   darc={darc as Darc}
-                  success={success}
                   setSuccess={setSuccess}
                 ></AdminElem>
               );
             }) || <Spinner />}
             <NewAdminElem
               darc={darc as Darc}
-              success={success}
               setSuccess={setSuccess}
             />
           </PanelElement>

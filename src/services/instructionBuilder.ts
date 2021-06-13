@@ -1,15 +1,37 @@
 import {
   Argument,
   ClientTransaction,
-  Instruction,
+  Instruction
 } from "@dedis/cothority/byzcoin";
 import { Darc, IdentityWrapper, SignerEd25519 } from "@dedis/cothority/darc";
 import { arrayRemove } from "../tools/helpers";
-import { getAdmins, hex2Bytes } from "./cothorityUtils";
+import { getAdmins, getMultiSigRule, hex2Bytes } from "./cothorityUtils";
 import { getDarcID } from "./roster";
 
 // Admins #####################################################################################
 
+/**
+ * Update the administation rules of a darc
+ * @param darc The darc to update
+ * @param multisigExpr The multisignature expression
+ * @param orExpr The or expression (any admin can perform the action)
+ * @returns the darc with updated rules
+ */
+export const updateRules = (
+  darc: Darc,
+  multisigExpr: Buffer,
+  orExpr: Buffer
+) => {
+  darc.rules.setRuleExp("spawn:darc", multisigExpr);
+  darc.rules.setRuleExp("invoke:darc.evolve", multisigExpr);
+  darc.rules.setRuleExp("spawn:project", multisigExpr);
+  darc.rules.setRuleExp("invoke:project.add", multisigExpr);
+  darc.rules.setRuleExp("invoke:project.remove", multisigExpr);
+  darc.rules.setRuleExp("spawn:deferred", orExpr);
+  darc.rules.setRuleExp("invoke:deferred.addProof", orExpr);
+  darc.rules.setRuleExp("invoke:deferred.execProposedTx", orExpr);
+  return darc;
+};
 /**
  * Evolve a darc given an administrator list and the current darc as argument
  * @param adminList The list of administrators of the consortium
@@ -18,16 +40,12 @@ import { getDarcID } from "./roster";
  */
 export const evolveDarcWithAdminList = (adminList: string[], darc: Darc) => {
   var newDarc: Darc = darc.evolve();
-  const multisigExpr = Buffer.from(`threshold<2/3,${adminList.join(",")}>`);
+  const threshold = getMultiSigRule(darc);
+  const multisigExpr = Buffer.from(
+    `threshold<${threshold},${adminList.join(",")}>`
+  );
   const orExpr = Buffer.from(`${adminList.join("|")}`);
-  newDarc.rules.setRuleExp("spawn:darc", multisigExpr);
-  newDarc.rules.setRuleExp("invoke:darc.evolve", multisigExpr);
-  newDarc.rules.setRuleExp("spawn:project", multisigExpr);
-  newDarc.rules.setRuleExp("invoke:project.add", multisigExpr);
-  newDarc.rules.setRuleExp("invoke:project.remove", multisigExpr);
-  newDarc.rules.setRuleExp("spawn:deferred", orExpr);
-  newDarc.rules.setRuleExp("invoke:deferred.addProof", orExpr);
-  newDarc.rules.setRuleExp("invoke:deferred.execProposedTx", orExpr);
+  newDarc = updateRules(newDarc, multisigExpr, orExpr);
   return newDarc;
 };
 /**
@@ -78,6 +96,26 @@ export const modifyAdminFromDarc = (
   admins = arrayRemove(admins as string[], admin);
   admins.push(newAdmin);
   const newDarc = evolveDarcWithAdminList(admins, darc);
+  const tx = createDarcEvolveInstruction(newDarc);
+  return createDeferredTransaction(tx);
+};
+/**
+ * Evolve a darc to change the multisignature rule threshold
+ * @param darc The current darc
+ * @param threshold The new threshold
+ * @returns the evolved darc with the new multi signature rule threshold
+ */
+export const changeThresholdFromDarc = (
+  darc: Darc,
+  threshold: string
+): ClientTransaction => {
+  var newDarc: Darc = darc.evolve();
+  var admins = getAdmins(darc) as string[];
+  const multisigExpr = Buffer.from(
+    `threshold<${threshold},${admins.join(",")}>`
+  );
+  const orExpr = Buffer.from(`${admins.join("|")}`);
+  newDarc = updateRules(newDarc, multisigExpr, orExpr);
   const tx = createDarcEvolveInstruction(newDarc);
   return createDeferredTransaction(tx);
 };
@@ -220,4 +258,3 @@ export const addUserRightsToProject = (
   const tx = ClientTransaction.make(2, instruction);
   return tx;
 };
-
