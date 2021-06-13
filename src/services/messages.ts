@@ -1,9 +1,15 @@
 import { network } from "@dedis/cothority";
+import { ClientTransaction } from "@dedis/cothority/byzcoin";
 import { addJSON, registerMessage } from "@dedis/cothority/protobuf";
 import { Message } from "protobufjs/light";
 import models from "./protobuf/models.json";
-import { ClientTransaction } from "@dedis/cothority/byzcoin";
+/**
+ * File containing all protobuf message definitions
+ */
 
+/**
+ * Protobuf definition of a Bypro Query
+ */
 export class Query extends Message<Query> {
   static register() {
     registerMessage("bypros.Query", Query);
@@ -11,7 +17,9 @@ export class Query extends Message<Query> {
 
   query!: string;
 }
-
+/**
+ * Protobuf definition of a Bypro Query reply
+ */
 export class QueryReply extends Message<QueryReply> {
   static register() {
     registerMessage("bypros.QueryReply", QueryReply);
@@ -19,7 +27,9 @@ export class QueryReply extends Message<QueryReply> {
 
   readonly result!: Buffer;
 }
-
+/**
+ * Protobuf definition of a Bypro follow request. We use this to ask bypros to follow a Byzcoin conode
+ */
 export class Follow extends Message<Follow> {
   static register() {
     registerMessage("bypros.Follow", Follow);
@@ -28,19 +38,25 @@ export class Follow extends Message<Follow> {
   scid!: Buffer;
   target!: network.ServerIdentity;
 }
-
+/**
+ * Protobuf definition of an empty protobuf reply
+ */
 export class EmptyReply extends Message<EmptyReply> {
   static register() {
     registerMessage("bypros.EmptyReply", EmptyReply);
   }
 }
-
+/**
+ * Protobuf definition of a Bypro unfollow request. We use this to ask bypros to unfollow a Byzcoin conode
+ */
 export class Unfollow extends Message<Unfollow> {
   static register() {
     registerMessage("bypros.Unfollow", Unfollow);
   }
 }
-
+/**
+ * Protobuf definition of a Bypro catchup request. We use this to ask bypros to catch up the Byzcoin missing data.
+ */
 export class CatchUpMsg extends Message<CatchUpMsg> {
   static register() {
     registerMessage("bypros.CatchUpMsg", CatchUpMsg);
@@ -51,7 +67,9 @@ export class CatchUpMsg extends Message<CatchUpMsg> {
   fromblock!: Buffer;
   updateevery!: number;
 }
-
+/**
+ * Protobuf definition of a Bypros catch up status
+ */
 export class CatchUpStatus extends Message<CatchUpStatus> {
   static register() {
     registerMessage("bypros.CatchUpStatus", CatchUpStatus);
@@ -67,7 +85,9 @@ export class CatchUpStatus extends Message<CatchUpStatus> {
     }, block hash: ${this.blockhash.toString("hex")}`;
   }
 }
-
+/**
+ * Protobuf definition of a Bypros catch up response.
+ */
 export class CatchUpResponse extends Message<CatchUpResponse> {
   static register() {
     registerMessage("bypros.CatchUpResponse", CatchUpResponse, CatchUpStatus);
@@ -83,7 +103,9 @@ export class CatchUpResponse extends Message<CatchUpResponse> {
     }`;
   }
 }
-
+/**
+ * Protobuf definition of a Deferred contract instance
+ */
 export class DeferredData extends Message<DeferredData> {
   static register() {
     registerMessage("deferred.DeferredData", DeferredData);
@@ -105,7 +127,9 @@ export class DeferredData extends Message<DeferredData> {
 - ExecResult: ${this.execresult}`;
   }
 }
-
+/**
+ * Protobuf definition of a Project contract instance
+ */
 export class ProjectContract extends Message<ProjectContract> {
   static register() {
     registerMessage("contracts.ProjectContract", ProjectContract);
@@ -119,7 +143,9 @@ export class ProjectContract extends Message<ProjectContract> {
     return ``;
   }
 }
-
+/**
+ * Protobuf definition of an Authorization object
+ */
 export class Authorization extends Message<Authorization> {
   static register() {
     registerMessage("contracts.Authorization", Authorization);
