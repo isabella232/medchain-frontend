@@ -1,17 +1,15 @@
 import { Darc } from "@dedis/cothority/darc";
 
-export const keyRegex: RegExp = /ed25519\:[a-fA-F0-9]{64}/g;
+export const identityRe: RegExp = /ed25519\:[a-fA-F0-9]{64}/g;
 
 /**
- * Create a list of administrators from the _sign expression
+ * Get the list of administrators from the invoke:darc.evolve expression
  * @param darc The administration darc
  * @returns the list of admins
  */
 export const getAdmins = (darc: Darc) => {
-  const signExpr: string = darc.rules.getRule("_sign").getExpr().toString();
-  console.log(signExpr);
-  const admins = signExpr.match(keyRegex);
-  console.log(admins);
+  const expr: string = darc.rules.getRule("invoke:darc.evolve").getExpr().toString();
+  const admins = expr.match(identityRe);
   return admins;
 };
 /**

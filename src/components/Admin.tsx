@@ -10,13 +10,14 @@ import { getDarc, sendTransaction } from "../services/cothorityGateway";
 import { getAdmins, validateKey } from "../services/cothorityUtils";
 import {
   addAdmintoDarc,
-  removeFromAdmintoDarc,
+  modifyAdminFromDarc,
+  removeAdminFromDarc,
 } from "../services/instructionBuilder";
-import { AddButton, ModifyButton, CopyButton } from "./Buttons";
+import { AddButton, CopyButton, ModifyButton } from "./Buttons";
+import Error from "./Error";
 import PageLayout from "./PageLayout";
 import PanelElement from "./PanelElement";
 import Spinner from "./Spinner";
-import Error from "./Error";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
@@ -36,7 +37,7 @@ const AdminElem: FunctionComponent<{
   };
 
   const removeKey = () => {
-    const tx = removeFromAdmintoDarc(darc, name);
+    const tx = removeAdminFromDarc(darc, name);
     sendTransaction(tx, connection.private)
       .then((res) => {
         setSuccess(res);
@@ -47,6 +48,18 @@ const AdminElem: FunctionComponent<{
         setRemoveAdminModalOpen(false);
       });
   };
+  // const modifyKey = () => {
+  //   const tx = modifyAdminFromDarc(darc, name);
+  //   sendTransaction(tx, connection.private)
+  //     .then((res) => {
+  //       setSuccess(res);
+  //       setRemoveAdminModalOpen(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setRemoveAdminModalOpen(false);
+  //     });
+  // };
 
   return (
     <div className="">
@@ -62,7 +75,7 @@ const AdminElem: FunctionComponent<{
         the Administrator consortium
       </TransactionModal>
       {modifying ? (
-        <ModifyAdmin setModifying={setModifying} oldKey={name} />
+        <ModifyAdmin setModifying={setModifying} setSuccess={setSuccess} oldKey={name} darc={darc} />
       ) : (
         <div className="flex space-x-2">
           <p className="">{name}</p>
@@ -92,8 +105,11 @@ const AdminElem: FunctionComponent<{
 const ModifyAdmin: FunctionComponent<{
   setModifying: React.Dispatch<React.SetStateAction<boolean>>;
   oldKey: string;
-}> = ({ setModifying, oldKey }) => {
+  darc: Darc;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ setModifying, setSuccess, oldKey, darc }) => {
   const [error, setError] = useState("");
+  const { connection } = useContext(ConnectionContext);
   const [newKey, setNewKey] = useState("");
   const abort = () => {
     setModifying(false);
@@ -102,12 +118,17 @@ const ModifyAdmin: FunctionComponent<{
   };
 
   const confirm = () => {
-    // TODO call the execution of the transaction modal etc... -> sign tx
     if (!validateKey(newKey)) {
       setError("Not a valid public address");
       return;
     }
     setError("");
+    const tx = modifyAdminFromDarc(darc, oldKey, newKey);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -155,9 +176,7 @@ const NewAdminElem: FunctionComponent<{
       return;
     }
     setError("");
-    console.log("Actual Darc :", darc);
     const tx = addAdmintoDarc(darc, newKey);
-    console.log("new deff tx :", tx);
     sendTransaction(tx, connection.private)
       .then((res) => {
         setSuccess(res);
@@ -201,7 +220,7 @@ const Admin = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // TODO add the true rules for the administration darc - 
+    // TODO add the true rules for the administration darc -
     // evolve DARC tresh,
     // spawn project tresh
     // update - remove invoke on project tresh
