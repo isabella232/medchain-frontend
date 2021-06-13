@@ -43,7 +43,7 @@ export async function getProject(instanceid: string) {
 
   const rpc = await ByzCoinRPC.fromByzcoin(roster, hex2Bytes(getByzcoinID()));
   const proof = await rpc.getProof(hex2Bytes(instanceid));
-
+  console.log(proof.value)
   const project = ProjectContract.decode(Buffer.from(proof.value));
 
   return { instanceid: instanceid, project: project };

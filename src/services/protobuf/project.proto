@@ -7,16 +7,13 @@ option java_outer_classname = "project";
 message ProjectContract {
     required string name = 1;
     required string description = 2;
-    required Authorizations authorizations = 3;
+    repeated Authorization authorizations = 3;
 }
 
-message Authorizations {
-    repeated Authorization authorizations = 1;
-}
 
 message Authorization {
-    required string userID = 1;
-    repeated string queryTerms = 2;
+    required string userid = 1;
+    repeated string queryterms = 2;
 }
 
 

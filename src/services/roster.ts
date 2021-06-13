@@ -1,8 +1,8 @@
 export function getByzcoinID() {
-  return `62602e0f2384d48d9eb50480e994738791aa7b53a2866a02a6dbfc0d06e5cdc5`
+  return `ce98bc8acdf8b121d75cd6aabd939603b060984523ce82eb6d5d7d7b3bed4038`
 }
 export function getDarcID() {
-  return `c8caf73f42f215244efdc7cf74ec814a69bac71facc20a3092104a358aa1c068`
+  return `9ff9717717661914153e70569ae8e6a4cca81baeedb42c071995f27d6f57ecf4`
 }
 
 // Replace the roster with yours

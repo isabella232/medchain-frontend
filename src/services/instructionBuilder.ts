@@ -77,6 +77,27 @@ export const signDeferredTransaction = (
   return tx;
 };
 
+export const addUserRightsToProject = (
+  userID: string,
+  queryTerm: string,
+  instanceID: Buffer
+) => {
+  const userIDArg = new Argument({
+    name: "userID",
+    value: Buffer.from(userID),
+  });
+  const queryTermArg = new Argument({
+    name: "queryTerm",
+    value: Buffer.from(queryTerm),
+  });
+  const instruction = Instruction.createInvoke(instanceID, "project", "add", [
+    userIDArg,
+    queryTermArg,
+  ]);
+  const tx = ClientTransaction.make(2, instruction);
+  return tx;
+};
+
 export const executeDeferredTransaction = (instanceID: string) => {
   const instruction = Instruction.createInvoke(
     hex2Bytes(instanceID),

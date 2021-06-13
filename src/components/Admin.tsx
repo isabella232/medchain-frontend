@@ -201,6 +201,11 @@ const Admin = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
+    // TODO add the true rules for the administration darc - 
+    // evolve DARC tresh,
+    // spawn project tresh
+    // update - remove invoke on project tresh
+    // Deferred - 1 admin
     getDarc().then((darc) => {
       setDarc(darc);
       console.log(darc);
@@ -223,6 +228,7 @@ const Admin = () => {
             )}
           </PanelElement>
           <PanelElement title="Multisignature Policies">
+            {/* TODO modify the threshold policy by replicating the DARC and just changing the threshold */}
             <div className="">
               <span className="font-bold mr-1">2/3</span>
               <span>of signers</span>

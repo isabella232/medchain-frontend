@@ -113,19 +113,7 @@ export class ProjectContract extends Message<ProjectContract> {
 
   name!: string;
   description!: number;
-  authorizations!: Authorizations;
-
-  toString(): string {
-    return ``;
-  }
-}
-
-export class Authorizations extends Message<Authorizations> {
-  static register() {
-    registerMessage("contracts.Authorizations", Authorizations);
-  }
-
-  authorizations!: Authorizations[];
+  authorizations!: Authorization[];
 
   toString(): string {
     return ``;
@@ -136,8 +124,8 @@ export class Authorization extends Message<Authorization> {
   static register() {
     registerMessage("contracts.Authorization", Authorization);
   }
-  userID!: string;
-  queryTerms!: string[];
+  userid!: string;
+  queryterms!: string[];
 
   toString(): string {
     return ``;
@@ -147,6 +135,7 @@ export class Authorization extends Message<Authorization> {
 addJSON(models);
 
 ProjectContract.register();
+Authorization.register();
 Query.register();
 QueryReply.register();
 Follow.register();
