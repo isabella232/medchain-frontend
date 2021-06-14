@@ -126,7 +126,6 @@ npm install
 
 You first need to update `/src/services/roster.ts` to the correct roster, which can be found in conode/tmp/public.toml if you followed the instructions above.
 
-<!-- TODO  Add how to store the admin darc ID and the genesis DARC-->
 
 #### npm run start to start the application
 

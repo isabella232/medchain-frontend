@@ -17,7 +17,6 @@ const Success: FunctionComponent<{
         className={classnames(
           "bg-green-100 text-green-600 rounded-lg text-sm py-1 px-2 capitalize mr-4",
           "transition duration-1000 ease-in-out",
-          // "-translate-x-full",
           !(success.length>0) && "transform translate-x-full opacity-0"
         )}
       >

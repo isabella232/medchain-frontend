@@ -36,7 +36,7 @@ const ConnectModal: FunctionComponent<{
         </span>
       </div>
       <div className="mt-4 space-y-4 flex flex-col justify-center text-gray-600">
-        <div className="">
+        <div>
           <label htmlFor="private" className="block font-bold">
             Private Key
           </label>
@@ -51,7 +51,7 @@ const ConnectModal: FunctionComponent<{
             )}
           />
         </div>
-        <div className="">
+        <div>
           <label htmlFor="public" className="block font-bold">
             Public Key
           </label>

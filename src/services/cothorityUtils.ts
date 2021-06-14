@@ -69,3 +69,12 @@ export function getTimeString(block: SkipBlock): string {
       seconds.substr(-2)
   );
 }
+/**
+ * Validate the multisignature rule expression
+ * @param rule The multisignature rule
+ * @returns true if the multisig rule is valid, false otherwise
+ */
+ export const validateMultisig = (rule: string): Boolean => {
+  const re: RegExp = /\d+\/\d+/;
+  return re.test(rule);
+};

@@ -5,11 +5,10 @@ import {
   Route,
   Switch,
 } from "react-router-dom";
-import Admin from "./components/Admin";
-import NotFound from "./components/NotFound";
-import Projects from "./components/Projects";
+import Admin from "./components/Administration/Admin";
+import Projects from "./components/Projects/Projects";
 import Sidebar from "./components/Sidebar";
-import Transactions from "./components/Transactions";
+import Transactions from "./components/Transactions/Transactions";
 import ConnectedContextProvider from "./contexts/ConnectionContext";
 import "./tailwind.generated.css";
 
@@ -24,7 +23,7 @@ function App() {
             <Route path="/admins" component={Admin} />
             <Route path="/transactions" component={Transactions} />
             <Route path="/projects" component={Projects} />
-            <Route component={NotFound} />
+            <Route component={Admin} />
           </Switch>
         </Router>
       </ConnectedContextProvider>

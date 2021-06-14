@@ -2,22 +2,26 @@ import classnames from "classnames";
 import { FunctionComponent } from "react";
 import { MdCancel } from "react-icons/md";
 
-const Error: FunctionComponent<{
+export type ErrorMessage = {
   message: string;
-  reset: React.Dispatch<React.SetStateAction<string>>;
-  title: string
-}> = ({ message, reset, title }) => {
+  title: string;
+};
+
+const Error: FunctionComponent<{
+  errorMessage: ErrorMessage;
+  reset: React.Dispatch<React.SetStateAction<ErrorMessage | undefined>>;
+}> = ({ errorMessage, reset }) => {
   return (
     <div className="bg-red-100 text-red-600 py-1 px-2 capitalize rounded-lg text-sm">
       <div className="text-red-400 flex">
-        <button onClick={(e) => reset("")}>
+        <button onClick={(e) => reset(undefined)}>
           <MdCancel />
         </button>
         <span className={classnames("font-bold ml-3 text-red-600")}>
-          {title}
+          {errorMessage.title}
         </span>
       </div>
-      {message}
+      {errorMessage.message}
     </div>
   );
 };

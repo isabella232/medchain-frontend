@@ -2,30 +2,29 @@ import { Instruction as InstructionType } from "@dedis/cothority/byzcoin";
 import classnames from "classnames";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
-import classes from "../classes/classes";
-import { ConnectionContext } from "../contexts/ConnectionContext";
-import { queries } from "../services/byprosQueries";
+import classes from "../../classes/classes";
+import { ConnectionContext } from "../../contexts/ConnectionContext";
+import { queries } from "../../services/byprosQueries";
 import {
   byprosQuery,
   getBlock,
   getDeferred,
   sendTransaction,
-} from "../services/cothorityGateway";
-import { getTimeString, hex2Bytes } from "../services/cothorityUtils";
+} from "../../services/cothorityGateway";
+import { getTimeString, hex2Bytes } from "../../services/cothorityUtils";
 import {
   executeDeferredTransaction,
   signDeferredTransaction,
-} from "../services/instructionBuilder";
-import { DeferredData } from "../services/messages";
-import { CopyButton, ExecuteButton, SignButton } from "./Buttons";
-import Error from "./Error";
-import PageLayout from "./PageLayout";
-import Pager from "./Pager";
-import PanelElement from "./PanelElement";
-import Spinner from "./Spinner";
-import Success from "./Success";
-import TransactionModal from "./TransactionModal";
-
+} from "../../services/instructionBuilder";
+import { DeferredData } from "../../services/messages";
+import { CopyButton, ExecuteButton, SignButton } from "../Buttons";
+import Error, { ErrorMessage } from "../Error";
+import PageLayout from "../PageLayout";
+import Pager from "../Pager";
+import PanelElement from "../PanelElement";
+import Spinner from "../Spinner";
+import Success from "../Success";
+import TransactionModal from "../TransactionModal";
 
 const Instruction: FunctionComponent<{
   instructionHash: Buffer;
@@ -33,7 +32,7 @@ const Instruction: FunctionComponent<{
   index: number;
   instanceID: string;
   executed?: boolean;
-  setError: React.Dispatch<React.SetStateAction<string>>;
+  setError: React.Dispatch<React.SetStateAction<ErrorMessage | undefined>>;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
   setSelectedTransaction: any;
 }> = ({
@@ -75,12 +74,12 @@ const Instruction: FunctionComponent<{
       .catch((err) => {
         console.log(err);
         setSignModal(false);
-        setError(err);
+        setError({ message: err, title: "Failed to send the transaction" });
       });
   };
 
   return (
-    <div className="">
+    <div>
       <TransactionModal
         modalIsOpen={signModalIsOpen}
         setIsOpen={setSignModal}
@@ -89,16 +88,22 @@ const Instruction: FunctionComponent<{
         abortAction={() => setSignModal(false)}
       >
         <PanelElement title="Instruction Hash">
-          <div className="">{instructionHash.toString("hex")}</div>
+          <div>{instructionHash.toString("hex")}</div>
         </PanelElement>
         <PanelElement title="Contract">
-          <div className="">{instructionData.invoke? instructionData.invoke.contractID : instructionData.spawn.contractID}</div>
+          <div>
+            {instructionData.invoke
+              ? instructionData.invoke.contractID
+              : instructionData.spawn.contractID}
+          </div>
         </PanelElement>
         <PanelElement title="Command">
-          <div className="">{instructionData.invoke? instructionData.invoke.command : "spawn"}</div>
+          <div>
+            {instructionData.invoke ? instructionData.invoke.command : "spawn"}
+          </div>
         </PanelElement>
         <PanelElement title="Signatures" last>
-          <div className="">
+          <div>
             {instructionData.signerIdentities.length === 0
               ? "No signature"
               : signers}
@@ -110,19 +115,27 @@ const Instruction: FunctionComponent<{
         <CopyButton elem={instructionHash.toString("hex")} />
       </PanelElement>
       <PanelElement title="Contract">
-        <div className="">{instructionData.invoke? instructionData.invoke.contractID: instructionData.spawn.contractID}</div>
+        <div>
+          {instructionData.invoke
+            ? instructionData.invoke.contractID
+            : instructionData.spawn.contractID}
+        </div>
       </PanelElement>
       <PanelElement title="Command">
-        <div className="">{instructionData.invoke? instructionData.invoke.command : "spawn"}</div>
+        <div>
+          {instructionData.invoke ? instructionData.invoke.command : "spawn"}
+        </div>
       </PanelElement>
       <PanelElement
         title={`Signatures (${instructionData.signatures.length})`}
         last
       >
-        <div className="">
-          {instructionData.signatures.length == 0 ? "No signature" : signers.map(signer => {
-            return <div>{signer}</div>
-          } )}
+        <div>
+          {instructionData.signatures.length == 0
+            ? "No signature"
+            : signers.map((signer) => {
+                return <div>{signer}</div>;
+              })}
         </div>
       </PanelElement>
 
@@ -148,8 +161,8 @@ const SelectedTransaction: FunctionComponent<{
   const [transactionData, setTransactionData] = useState<DeferredData>();
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
-  const [error, setError] = useState("");
-  const [date, setDate] = useState("")
+  const [error, setError] = useState<ErrorMessage | undefined>();
+  const [date, setDate] = useState("");
 
   const executeTransaction = () => {
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
@@ -162,7 +175,10 @@ const SelectedTransaction: FunctionComponent<{
       .catch((err) => {
         console.log(err);
         setExecuteModal(false);
-        setError(err.toString());
+        setError({
+          message: err.toString(),
+          title: "failed to execture the deferred transaction",
+        });
       });
   };
   const openExecuteModal = () => {
@@ -170,22 +186,29 @@ const SelectedTransaction: FunctionComponent<{
   };
 
   useEffect(() => {
-    console.log(selectedTransaction)
+    console.log(selectedTransaction);
     setTransactionData(undefined);
-    getDeferred(selectedTransaction.instanceid).then((result) => {
-      setTransactionData(result);
-      if (result.execresult.length !== 0) {
-        setExecuted(true);
-      }
-    }).catch(err => {setError(err.toString())
-    console.log(err)});
+    getDeferred(selectedTransaction.instanceid)
+      .then((result) => {
+        setTransactionData(result);
+        if (result.execresult.length !== 0) {
+          setExecuted(true);
+        }
+      })
+      .catch((err) => {
+        setError({
+          message: err.toString(),
+          title: "Failed to get the deferred transaction",
+        });
+        console.log(err);
+      });
 
     getBlock(selectedTransaction.blockhash).then((res) =>
       setDate(getTimeString(res))
     );
   }, [selectedTransaction]);
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3">
+    <div className={classnames(classes.box)}>
       <TransactionModal
         modalIsOpen={executeModalIsOpen}
         setIsOpen={setExecuteModal}
@@ -197,35 +220,29 @@ const SelectedTransaction: FunctionComponent<{
         {selectedTransaction.instanceid}
         <CopyButton elem={selectedTransaction.instanceid} />
       </PanelElement>
-      <PanelElement title="Date">
-        {date? date: <Spinner/>}
-      </PanelElement>
-      {transactionData ? (
-        transactionData.proposedtransaction.instructions.map(
-          (instruction, idx) => {
-            return (
-              <Instruction
-                instructionHash={transactionData?.instructionhashes[idx]}
-                instructionData={instruction}
-                index={idx}
-                instanceID={selectedTransaction.instanceid}
-                executed={executed}
-                setSuccess={setSuccess}
-                setError={setError}
-                setSelectedTransaction={setSelectedTransaction}
-              />
-            );
-          }
-        )
-      ) : (
-       !error &&  <Spinner />
-      )}
+      <PanelElement title="Date">{date ? date : <Spinner />}</PanelElement>
+      {transactionData
+        ? transactionData.proposedtransaction.instructions.map(
+            (instruction, idx) => {
+              return (
+                <Instruction
+                  instructionHash={transactionData?.instructionhashes[idx]}
+                  instructionData={instruction}
+                  index={idx}
+                  instanceID={selectedTransaction.instanceid}
+                  executed={executed}
+                  setSuccess={setSuccess}
+                  setError={setError}
+                  setSelectedTransaction={setSelectedTransaction}
+                />
+              );
+            }
+          )
+        : !error && <Spinner />}
       {transactionData && !executed && (
         <ExecuteButton className="mt-4" onClick={openExecuteModal} />
       )}
-      {error && (
-        <Error message={error} reset={setError} title="Transaction failed" />
-      )}
+      {error && <Error errorMessage={error} reset={setError} />}
     </div>
   );
 };
