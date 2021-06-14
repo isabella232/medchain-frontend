@@ -1,3 +1,4 @@
+import { Darc } from "@dedis/cothority/darc";
 import classnames from "classnames";
 import {
   FunctionComponent,
@@ -6,29 +7,92 @@ import {
   useMemo,
   useState,
 } from "react";
+import { AiFillMinusCircle } from "react-icons/ai";
+import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
+import { GiConfirmed } from "react-icons/gi";
 import { GoProject } from "react-icons/go";
+import { IoMdArrowDropdown, IoMdArrowDropright } from "react-icons/io";
+import { MdCancel } from "react-icons/md";
+import { useExpanded, useFilters, useSortBy, useTable } from "react-table";
 import { ConnectionContext } from "../contexts/ConnectionContext";
 import {
   byprosQuery,
   getProject,
   sendTransaction,
 } from "../services/cothorityGateway";
+import Success from "./Success";
 import { hex2Bytes } from "../services/cothorityUtils";
 import { addUserRightsToProject } from "../services/instructionBuilder";
-import { ProjectContract, Authorization } from "../services/messages";
+import { Authorization, ProjectContract } from "../services/messages";
 import { AddButton, CopyButton } from "./Buttons";
+import Error from "./Error";
 import PageLayout from "./PageLayout";
 import { ProjectsPager } from "./Pager";
 import PanelElement from "./PanelElement";
 import Spinner from "./Spinner";
-import { useTable, useFilters, useSortBy, useExpanded } from "react-table";
-import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
-import { AiFillMinusCircle } from "react-icons/ai";
-import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
-import { GiConfirmed } from "react-icons/gi";
-import { MdCancel } from "react-icons/md";
-import Error from "./Error";
 import TransactionModal from "./TransactionModal";
+
+/**
+ * Display the input to add a new administrator key in the consortium
+ */
+const NewAccessRight: FunctionComponent<{
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+  userId: string;
+  authorization: Authorization;
+  instanceId: Buffer;
+}> = ({ setSuccess, userId, authorization, instanceId }) => {
+  const [showNewAccessRight, setShowNewAccessRight] = useState(false);
+  const [NewAccessRight, setNewAccessRight] = useState("");
+  const [error, setError] = useState("");
+  const { connection } = useContext(ConnectionContext);
+
+  const abort = () => {
+    setNewAccessRight("");
+    setError("");
+    setShowNewAccessRight(false);
+  };
+
+  const confirm = () => {
+    // TODO add user rights checks
+    setError("");
+    const tx = addUserRightsToProject(userId, NewAccessRight, instanceId);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return showNewAccessRight ? (
+    <>
+      {" "}
+      <div className="space-y-1">
+        <label className="text-xs ml-1 mb-1">New Access Right:</label>
+        <div className="flex space-x-2">
+          <input
+            name="field_name"
+            className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+            type="text"
+            placeholder="count_per_site_obsfucated..."
+            value={NewAccessRight}
+            onChange={(e) => setNewAccessRight(e.target.value)}
+          />
+          <button className={classnames("text-green-400")} onClick={confirm}>
+            <GiConfirmed />
+          </button>
+          <button className={classnames("text-red-400")} onClick={abort}>
+            <MdCancel />
+          </button>
+        </div>
+        {error && (
+          <Error message={error} reset={setError} title="Transaction failed" />
+        )}
+      </div>
+    </>
+  ) : (
+    <AddButton onClick={(e) => setShowNewAccessRight(true)} />
+  );
+};
 
 const AccessRight: FunctionComponent<{
   action: string;
@@ -51,7 +115,9 @@ const AccessRight: FunctionComponent<{
 
 const UserRights: FunctionComponent<{
   authorization: Authorization;
-}> = ({ authorization }) => {
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+  instanceId: Buffer;
+}> = ({ authorization, setSuccess, instanceId }) => {
   return (
     <div className="px-4">
       <PanelElement title="User ID">
@@ -63,7 +129,12 @@ const UserRights: FunctionComponent<{
             return <AccessRight action={term} />;
           })}
           {/* TODO add the function to add rights to a user */}
-          <AddButton />
+          <NewAccessRight
+            setSuccess={setSuccess}
+            userId={authorization.userid}
+            authorization={authorization}
+            instanceId={instanceId}
+          />
         </PanelElement>
       )}
     </div>
@@ -72,47 +143,60 @@ const UserRights: FunctionComponent<{
 
 const AddUser: FunctionComponent<{
   setShowNewUser: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setShowNewUser }) => {
-  const [user, setUser] = useState("");
-  const [right, setRights] = useState("");
+  instanceId: Buffer;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ setShowNewUser, setSuccess, instanceId }) => {
+  const [userId, setUserId] = useState("");
+  const [accessRight, setAccesRight] = useState("");
   const [error, setError] = useState("");
+  const { connection } = useContext(ConnectionContext);
   const [addUserModalIsOpen, setAddUserModalIsOpen] = useState(false);
 
   const abort = () => {
-    setUser("");
-    setRights("");
+    setUserId("");
+    setAccesRight("");
     setError("");
     setShowNewUser(false);
   };
-  const addUser = () => {};
+  const confirm = () => {
+    setError("");
+    const tx = addUserRightsToProject(userId, accessRight, instanceId);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div>
-      <TransactionModal
-        modalIsOpen={addUserModalIsOpen}
-        setIsOpen={setAddUserModalIsOpen}
-        title="Add user to project"
-        executeAction={() => addUser()}
-        abortAction={() => setAddUserModalIsOpen(false)}
-      ></TransactionModal>
-      <div className="">
-        <div className="space-y-1">
-          <label className="text-xs ml-1 mb-1">New Key:</label>
-          <div className="flex space-x-2">
-            <input
-              name="user"
-              className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
-              type="text"
-              placeholder="user ID"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-            />
-            <button className={classnames("text-green-400")} onClick={() => {}}>
-              <GiConfirmed />
-            </button>
-            <button className={classnames("text-red-400")} onClick={abort}>
-              <MdCancel />
-            </button>
+      <div className="flex items-end space-x-2">
+        <div className="space-y-1 flex-grow">
+          <div>
+            <label className="text-xs ml-1 mb-1">New User:</label>
+            <div className="flex space-x-2">
+              <input
+                name="user"
+                className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+                type="text"
+                placeholder="user ID"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs ml-1 mb-1">New User:</label>
+            <div className="flex space-x-2">
+              <input
+                name="user"
+                className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+                type="text"
+                placeholder="count_per_site_obsfucated"
+                value={accessRight}
+                onChange={(e) => setAccesRight(e.target.value)}
+              />
+            </div>
           </div>
           {error && (
             <Error
@@ -121,6 +205,14 @@ const AddUser: FunctionComponent<{
               title="Transaction failed"
             />
           )}
+        </div>
+        <div className="space-x-2">
+          <button className={classnames("text-green-400")} onClick={confirm}>
+            <GiConfirmed />
+          </button>
+          <button className={classnames("text-red-400")} onClick={abort}>
+            <MdCancel />
+          </button>
         </div>
       </div>
     </div>
@@ -131,7 +223,7 @@ const SelectedProject: FunctionComponent<{
   selectedTransaction: any;
   setSelectedTransaction: any;
   success: any;
-  setSuccess: any;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ selectedTransaction, setSelectedTransaction, success, setSuccess }) => {
   const [showNewUser, setShowNewUser] = useState(false);
 
@@ -228,7 +320,11 @@ const SelectedProject: FunctionComponent<{
       {selectedTransaction.project.authorizations && (
         <PanelElement title="Users" last>
           {showNewUser ? (
-            <AddUser setShowNewUser={setShowNewUser} />
+            <AddUser
+              setShowNewUser={setShowNewUser}
+              setSuccess={setSuccess}
+              instanceId={hex2Bytes(selectedTransaction.instanceid)}
+            />
           ) : (
             <>
               <div className="flex">
@@ -312,7 +408,13 @@ const SelectedProject: FunctionComponent<{
                           {row.isExpanded && (
                             <tr>
                               <td colSpan={visibleColumns.length}>
-                                <UserRights authorization={row.original} />
+                                <UserRights
+                                  authorization={row.original}
+                                  setSuccess={setSuccess}
+                                  instanceId={hex2Bytes(
+                                    selectedTransaction.instanceid
+                                  )}
+                                />
                               </td>
                             </tr>
                           )}
@@ -328,12 +430,6 @@ const SelectedProject: FunctionComponent<{
               {/* TODO add the function to add a user to the project*/}
             </>
           )}
-
-          {/* <button
-            onClick={() => addUserRights("userE", "count_per_site_shuffled")}
-          >
-            click
-          </button> */}
         </PanelElement>
       )}
     </div>
@@ -429,6 +525,11 @@ const Projects: FunctionComponent = () => {
           )}
         </div>
       </div>
+      <Success
+        success={success}
+        setSuccess={setSuccess}
+        title="Transaction submitted"
+      />
     </PageLayout>
   );
 };

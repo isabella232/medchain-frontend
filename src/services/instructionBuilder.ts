@@ -1,7 +1,7 @@
 import {
   Argument,
   ClientTransaction,
-  Instruction
+  Instruction,
 } from "@dedis/cothority/byzcoin";
 import { Darc, IdentityWrapper, SignerEd25519 } from "@dedis/cothority/darc";
 import { arrayRemove } from "../tools/helpers";
@@ -211,16 +211,16 @@ export const executeDeferredTransaction = (instanceID: string) => {
 
 /**
  * Create a transaction to spawn a project contract
- * @param userID The ID of the user
- * @param userID The access right to add
+ * @param name The name of the project
+ * @param description The description of the project
  * @param instanceID The instance ID of the project contract
- * @returns the transaction to add the user right to the project
+ * @returns the transaction to spawn a new project
  */
-export const spawnProjectInstruction = (darc: Darc) => {
-  const nameArg = new Argument({ name: "name", value: Buffer.from("test") });
+export const spawnProject = (name: string, description: string) => {
+  const nameArg = new Argument({ name: "name", value: Buffer.from(name) });
   const descriptionArg = new Argument({
     name: "description",
-    value: Buffer.from("description"),
+    value: Buffer.from(description),
   });
 
   const instruction = Instruction.createSpawn(
@@ -229,12 +229,12 @@ export const spawnProjectInstruction = (darc: Darc) => {
     [nameArg, descriptionArg]
   );
   const tx = ClientTransaction.make(2, instruction);
-  return tx;
+  return createDeferredTransaction(tx);
 };
 /**
  * Create a transaction to add a user right to a project contract
  * @param userID The ID of the user
- * @param userID The access right to add
+ * @param queryTerm The access right to add
  * @param instanceID The instance ID of the project contract
  * @returns the transaction to add the user right to the project
  */
@@ -256,5 +256,32 @@ export const addUserRightsToProject = (
     queryTermArg,
   ]);
   const tx = ClientTransaction.make(2, instruction);
-  return tx;
+  return createDeferredTransaction(tx);
+};
+/**
+ * Create a transaction to remove a user right to a project contract
+ * @param userID The ID of the user
+ * @param userID The access right to remove
+ * @param instanceID The instance ID of the project contract
+ * @returns the transaction to remove the user right to the project
+ */
+export const removeUserRightFromProject = (
+  userID: string,
+  queryTerm: string,
+  instanceID: Buffer
+) => {
+  const userIDArg = new Argument({
+    name: "userID",
+    value: Buffer.from(userID),
+  });
+  const queryTermArg = new Argument({
+    name: "queryTerm",
+    value: Buffer.from(queryTerm),
+  });
+  const instruction = Instruction.createInvoke(instanceID, "project", "remove", [
+    userIDArg,
+    queryTermArg,
+  ]);
+  const tx = ClientTransaction.make(2, instruction);
+  return createDeferredTransaction(tx);
 };

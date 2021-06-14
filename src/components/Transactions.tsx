@@ -169,12 +169,12 @@ const SelectedTransaction: FunctionComponent<{
   useEffect(() => {
     setTransactionData(undefined);
     getDeferred(selectedTransaction.instanceid).then((result) => {
-      console.log(result);
       setTransactionData(result);
       if (result.execresult.length !== 0) {
         setExecuted(true);
       }
-    });
+    }).catch(err => {setError(err.toString())
+    console.log(err)});
 
     // TODO implement transaction timestamp
     // getBlock().then((res) =>
@@ -212,7 +212,7 @@ const SelectedTransaction: FunctionComponent<{
           }
         )
       ) : (
-        <Spinner />
+       !error &&  <Spinner />
       )}
       {transactionData && !executed && (
         <ExecuteButton className="mt-4" onClick={openExecuteModal} />
