@@ -1,4 +1,6 @@
 import { Darc } from "@dedis/cothority/darc";
+import { SkipBlock } from "@dedis/cothority/skipchain";
+import { DataHeader } from "@dedis/cothority/byzcoin/proto";
 
 export const identityRe: RegExp = /ed25519\:[a-fA-F0-9]{64}/g;
 export const multisigRe: RegExp = /\d\/\d/g;
@@ -44,4 +46,26 @@ export function hex2Bytes(hex: string): Buffer {
   }
 
   return Buffer.from(hex, "hex");
+}
+/**
+ * Get the timestamp of a SkipBlock
+ * @param block The Skipblock
+ * @returns The timestamp at the time of the block creation
+ */
+export function getTimeString(block: SkipBlock): string {
+  const timestamp = Number(DataHeader.decode(block.data).timestamp);
+  const date = new Date(timestamp / 1000_000);
+  const hours = date.getHours();
+  const minutes = "0" + date.getMinutes();
+  const seconds = "0" + date.getSeconds();
+
+  return (
+      date.toISOString().slice(0, 10) +
+      " at " +
+      hours +
+      ":" +
+      minutes.substr(-2) +
+      ":" +
+      seconds.substr(-2)
+  );
 }

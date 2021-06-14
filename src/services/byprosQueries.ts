@@ -14,9 +14,18 @@ export const queries = {
   AND 
     cothority.transaction.Accepted = TRUE`,
     pendingTransactions:`SELECT
-    encode(cothority.instruction.contract_iid, 'hex') as instanceid
+    encode(cothority.instruction.contract_iid, 'hex') as instanceid,
+    encode(cothority.block.hash,'hex') as blockhash
   FROM
     cothority.instruction
+INNER JOIN 
+        cothority.transaction 
+      ON
+        cothority.transaction.transaction_id = cothority.instruction.transaction_id
+INNER JOIN 
+        cothority.block 
+      ON
+        cothority.transaction.block_id = cothority.block.block_id
   WHERE
     cothority.instruction.contract_name = 'deferred' 
   AND 
@@ -42,13 +51,18 @@ export const queries = {
         cothority.transaction.Accepted = TRUE
     ) `,
     transactionsHistory: `SELECT 
-    encode(cothority.instruction.contract_iid,'hex') as instanceid
+    encode(cothority.instruction.contract_iid,'hex') as instanceid,
+    encode(cothority.block.hash,'hex') as blockhash
   FROM
     cothority.instruction
   INNER JOIN 
     cothority.transaction 
   ON
     cothority.transaction.transaction_id = cothority.instruction.transaction_id
+  INNER JOIN 
+    cothority.block 
+  ON
+    cothority.transaction.block_id = cothority.block.block_id
   WHERE
     cothority.instruction.type_id = 3
   AND 

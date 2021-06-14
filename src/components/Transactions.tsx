@@ -7,10 +7,11 @@ import { ConnectionContext } from "../contexts/ConnectionContext";
 import { queries } from "../services/byprosQueries";
 import {
   byprosQuery,
+  getBlock,
   getDeferred,
   sendTransaction,
 } from "../services/cothorityGateway";
-import { hex2Bytes } from "../services/cothorityUtils";
+import { getTimeString, hex2Bytes } from "../services/cothorityUtils";
 import {
   executeDeferredTransaction,
   signDeferredTransaction,
@@ -148,6 +149,7 @@ const SelectedTransaction: FunctionComponent<{
   const [executed, setExecuted] = useState<boolean>(false);
   const { connection } = useContext(ConnectionContext);
   const [error, setError] = useState("");
+  const [date, setDate] = useState("")
 
   const executeTransaction = () => {
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
@@ -166,7 +168,9 @@ const SelectedTransaction: FunctionComponent<{
   const openExecuteModal = () => {
     setExecuteModal(true);
   };
+
   useEffect(() => {
+    console.log(selectedTransaction)
     setTransactionData(undefined);
     getDeferred(selectedTransaction.instanceid).then((result) => {
       setTransactionData(result);
@@ -176,10 +180,9 @@ const SelectedTransaction: FunctionComponent<{
     }).catch(err => {setError(err.toString())
     console.log(err)});
 
-    // TODO implement transaction timestamp
-    // getBlock().then((res) =>
-    //   console.log(DataBody.decode(Buffer.from(res.payload)))
-    // );
+    getBlock(selectedTransaction.blockhash).then((res) =>
+      setDate(getTimeString(res))
+    );
   }, [selectedTransaction]);
   return (
     <div className="bg-white rounded-lg shadow-lg p-3">
@@ -193,6 +196,9 @@ const SelectedTransaction: FunctionComponent<{
       <PanelElement title="Transaction instance ID">
         {selectedTransaction.instanceid}
         <CopyButton elem={selectedTransaction.instanceid} />
+      </PanelElement>
+      <PanelElement title="Date">
+        {date? date: <Spinner/>}
       </PanelElement>
       {transactionData ? (
         transactionData.proposedtransaction.instructions.map(
@@ -231,8 +237,6 @@ const Transactions = () => {
   const [transactionsHistoryData, setTransactionsHistoryData] = useState([]);
   const [success, setSuccess] = useState("");
   useEffect(() => {
-    // getDeferredData('a81b8d76b6a1453728a211c3823afb3b3ff0e572e77358f3ebadd4860f9b68ca')
-    // TODO embed query in file
     byprosQuery(queries.pendingTransactions).then((reply) => {
       setTransactionsData(reply.reverse());
     });
