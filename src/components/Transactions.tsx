@@ -24,6 +24,7 @@ import Spinner from "./Spinner";
 import Success from "./Success";
 import TransactionModal from "./TransactionModal";
 
+
 const Instruction: FunctionComponent<{
   instructionHash: Buffer;
   instructionData: InstructionType;
@@ -65,7 +66,6 @@ const Instruction: FunctionComponent<{
     );
     sendTransaction(tx, connection.private)
       .then((res) => {
-        console.log(res);
         setSignModal(false);
         setSuccess(res);
         setSelectedTransaction(undefined);
@@ -90,10 +90,10 @@ const Instruction: FunctionComponent<{
           <div className="">{instructionHash.toString("hex")}</div>
         </PanelElement>
         <PanelElement title="Contract">
-          <div className="">{instructionData.invoke.contractID}</div>
+          <div className="">{instructionData.invoke? instructionData.invoke.contractID : instructionData.spawn.contractID}</div>
         </PanelElement>
         <PanelElement title="Command">
-          <div className="">{instructionData.invoke.command}</div>
+          <div className="">{instructionData.invoke? instructionData.invoke.command : "spawn"}</div>
         </PanelElement>
         <PanelElement title="Signatures" last>
           <div className="">
@@ -108,10 +108,10 @@ const Instruction: FunctionComponent<{
         <CopyButton elem={instructionHash.toString("hex")} />
       </PanelElement>
       <PanelElement title="Contract">
-        <div className="">{instructionData.invoke.contractID}</div>
+        <div className="">{instructionData.invoke? instructionData.invoke.contractID: instructionData.spawn.contractID}</div>
       </PanelElement>
       <PanelElement title="Command">
-        <div className="">{instructionData.invoke.command}</div>
+        <div className="">{instructionData.invoke? instructionData.invoke.command : "spawn"}</div>
       </PanelElement>
       <PanelElement
         title={`Signatures (${instructionData.signatures.length})`}
@@ -152,7 +152,6 @@ const SelectedTransaction: FunctionComponent<{
     const tx = executeDeferredTransaction(selectedTransaction.instanceid);
     sendTransaction(tx, connection.private)
       .then((res) => {
-        console.log(res);
         setExecuteModal(false);
         setSuccess(res);
         setSelectedTransaction(undefined);
@@ -281,7 +280,6 @@ const Transactions = () => {
     cothority.transaction.Accepted = TRUE`).then((reply) => {
       setTransactionsHistoryData(reply.reverse());
     });
-    console.log(success);
   }, [success]);
 
   const [selectedTransaction, setSelectedTransaction] = useState<any>();

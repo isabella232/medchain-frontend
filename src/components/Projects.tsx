@@ -1,11 +1,10 @@
-import { Darc } from "@dedis/cothority/darc";
 import classnames from "classnames";
 import {
   FunctionComponent,
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from "react";
 import { AiFillMinusCircle } from "react-icons/ai";
 import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
@@ -14,15 +13,21 @@ import { GoProject } from "react-icons/go";
 import { IoMdArrowDropdown, IoMdArrowDropright } from "react-icons/io";
 import { MdCancel } from "react-icons/md";
 import { useExpanded, useFilters, useSortBy, useTable } from "react-table";
-import { ConnectionContext } from "../contexts/ConnectionContext";
+import {
+  ConnectionContext,
+  ConnectionType
+} from "../contexts/ConnectionContext";
 import {
   byprosQuery,
   getProject,
-  sendTransaction,
+  sendTransaction
 } from "../services/cothorityGateway";
-import Success from "./Success";
 import { hex2Bytes } from "../services/cothorityUtils";
-import { addUserRightsToProject } from "../services/instructionBuilder";
+import {
+  addUserRightsToProject,
+  removeUserRightFromProject,
+  spawnProject
+} from "../services/instructionBuilder";
 import { Authorization, ProjectContract } from "../services/messages";
 import { AddButton, CopyButton } from "./Buttons";
 import Error from "./Error";
@@ -30,7 +35,91 @@ import PageLayout from "./PageLayout";
 import { ProjectsPager } from "./Pager";
 import PanelElement from "./PanelElement";
 import Spinner from "./Spinner";
-import TransactionModal from "./TransactionModal";
+import Success from "./Success";
+
+/**
+ * Display the input to add a new administrator key in the consortium
+ */
+const NewProject: FunctionComponent<{
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+  connection: ConnectionType;
+}> = ({ setSuccess, connection }) => {
+  const [showNewProject, setShowNewProject] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState("");
+
+  const abort = () => {
+    setShowNewProject(false);
+    setError("");
+    setDescription("");
+    setName("");
+  };
+
+  const confirm = () => {
+    // TODO add user rights checks
+    setError("");
+    const tx = spawnProject(name, description);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+        console.log(res)
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return showNewProject ? (
+    <div>
+      <div className="flex items-end space-x-2">
+        <div className="space-y-1 flex-grow">
+          <div>
+            <label className="text-xs ml-1 mb-1">Project Name:</label>
+            <div className="flex space-x-2">
+              <input
+                name="user"
+                className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+                type="text"
+                placeholder="Project Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs ml-1 mb-1">Project Description:</label>
+            <div className="flex space-x-2">
+              <input
+                name="user"
+                className="border flex-grow border-2 rounded-lg px-1 py-1 w-full"
+                type="text"
+                placeholder="Project Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+          </div>
+          {error && (
+            <Error
+              message={error}
+              reset={setError}
+              title="Transaction failed"
+            />
+          )}
+        </div>
+        <div className="space-x-2">
+          <button className={classnames("text-green-400")} onClick={confirm}>
+            <GiConfirmed />
+          </button>
+          <button className={classnames("text-red-400")} onClick={abort}>
+            <MdCancel />
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <AddButton onClick={(e) => setShowNewProject(true)} />
+  );
+};
 
 /**
  * Display the input to add a new administrator key in the consortium
@@ -96,18 +185,25 @@ const NewAccessRight: FunctionComponent<{
 
 const AccessRight: FunctionComponent<{
   action: string;
-}> = ({ action }) => {
-  const setRemoveAdminModalOpen = () => {};
+  userId: string;
+  instanceId: Buffer;
+  connection: ConnectionType;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ setSuccess, connection, action, userId, instanceId }) => {
+  const removeAccessRight = () => {
+    const tx = removeUserRightFromProject(userId, action, instanceId);
+    sendTransaction(tx, connection.private)
+      .then((res) => {
+        setSuccess(res);
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="flex space-x-2">
       <p className="">{action}</p>
-
-      <button
-        className={classnames("text-red-400")}
-        // onClick={(e) => setRemoveAdminModalOpen(true)}
-      >
-        <AiFillMinusCircle />
+      <button className={classnames("text-red-400")}>
+        <AiFillMinusCircle onClick={removeAccessRight} />
       </button>
     </div>
   );
@@ -117,7 +213,8 @@ const UserRights: FunctionComponent<{
   authorization: Authorization;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
   instanceId: Buffer;
-}> = ({ authorization, setSuccess, instanceId }) => {
+  connection: ConnectionType;
+}> = ({ authorization, setSuccess, connection, instanceId }) => {
   return (
     <div className="px-4">
       <PanelElement title="User ID">
@@ -126,7 +223,15 @@ const UserRights: FunctionComponent<{
       {authorization.queryterms && (
         <PanelElement last title="User Rights">
           {authorization.queryterms.map((term) => {
-            return <AccessRight action={term} />;
+            return (
+              <AccessRight
+                action={term}
+                setSuccess={setSuccess}
+                userId={authorization.userid}
+                instanceId={instanceId}
+                connection={connection}
+              />
+            );
           })}
           {/* TODO add the function to add rights to a user */}
           <NewAccessRight
@@ -290,20 +395,6 @@ const SelectedProject: FunctionComponent<{
     setFilterInput(value);
   };
 
-  const addUserRights = (userID: string, queryTerm: string) => {
-    const tx = addUserRightsToProject(
-      userID,
-      queryTerm,
-      hex2Bytes(selectedTransaction.instanceid)
-    );
-    sendTransaction(tx, connection.private)
-      .then((res) => {
-        console.log(res);
-        setSuccess(res);
-      })
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {}, [selectedTransaction]);
   return (
     <div className="bg-white rounded-lg shadow-lg p-3">
@@ -411,6 +502,7 @@ const SelectedProject: FunctionComponent<{
                                 <UserRights
                                   authorization={row.original}
                                   setSuccess={setSuccess}
+                                  connection={connection}
                                   instanceId={hex2Bytes(
                                     selectedTransaction.instanceid
                                   )}
@@ -441,6 +533,7 @@ const Projects: FunctionComponent = () => {
   const [success, setSuccess] = useState("");
   const [selectedProject, setSelectedProject] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
+  const { connection } = useContext(ConnectionContext);
   useEffect(() => {
     var t0 = performance.now();
     const queryReplies = async () => {
@@ -501,9 +594,8 @@ const Projects: FunctionComponent = () => {
                 setSelectedProject={setSelectedProject}
               />
               <PanelElement title="Add a New Project" last>
-                <AddButton />
+                <NewProject setSuccess={setSuccess} connection={connection} />
               </PanelElement>
-              {/* TODO add the function to add a user to the project*/}
             </div>
           )}
         </div>

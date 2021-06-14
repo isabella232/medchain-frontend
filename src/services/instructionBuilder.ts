@@ -1,7 +1,7 @@
 import {
   Argument,
   ClientTransaction,
-  Instruction,
+  Instruction
 } from "@dedis/cothority/byzcoin";
 import { Darc, IdentityWrapper, SignerEd25519 } from "@dedis/cothority/darc";
 import { arrayRemove } from "../tools/helpers";
@@ -222,14 +222,16 @@ export const spawnProject = (name: string, description: string) => {
     name: "description",
     value: Buffer.from(description),
   });
-
   const instruction = Instruction.createSpawn(
     hex2Bytes(getDarcID()),
     "project",
-    [nameArg, descriptionArg]
+    [descriptionArg, nameArg]
   );
   const tx = ClientTransaction.make(2, instruction);
-  return createDeferredTransaction(tx);
+  // TODO should return a deferred transaction. 
+  // We have struggle to create the query that parse a spawn inside a deferred transaction. Once the query to get the projects
+  //  manage spawned with a deferred transaction we can change the returned to be "return createDeferredTransaction(tx);"
+  return tx;
 };
 /**
  * Create a transaction to add a user right to a project contract
