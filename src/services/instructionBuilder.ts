@@ -170,7 +170,7 @@ export const signDeferredTransaction = (
   sk: string,
   instructionHash: Buffer,
   instanceID: Buffer,
-  index: number //TODO modify this index during the transaction panel refactoring
+  index: number
 ) => {
   const sid = Buffer.from(hex2Bytes(sk));
   const signer = SignerEd25519.fromBytes(sid);
@@ -178,7 +178,7 @@ export const signDeferredTransaction = (
   const pkBuf = Buffer.from(IdentityWrapper.encode(wrapper).finish());
   const signature = signer.sign(instructionHash);
   const b = Buffer.allocUnsafe(4);
-  b.writeInt32LE(0, 0);
+  b.writeInt32LE(index, 0);
   const identityArg = new Argument({ name: "identity", value: pkBuf });
   const signatureArg = new Argument({ name: "signature", value: signature });
   const indexArg = new Argument({ name: "index", value: b });

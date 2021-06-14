@@ -234,8 +234,6 @@ const UserRights: FunctionComponent<{
               />
             );
           })}
-          {/* TODO add the function to add rights to a user */}
-          
         </PanelElement>
       )}
        <PanelElement last title="Add Access Rights">
