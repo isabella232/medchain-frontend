@@ -3,7 +3,7 @@ import { SkipBlock } from "@dedis/cothority/skipchain";
 import { DataHeader } from "@dedis/cothority/byzcoin/proto";
 
 export const identityRe: RegExp = /ed25519\:[a-fA-F0-9]{64}/g;
-export const multisigRe: RegExp = /\d\/\d/g;
+export const multisigRe: RegExp = /\d+\/\d+/g;
 
 /**
  * Get the list of administrators from the invoke:darc.evolve expression
