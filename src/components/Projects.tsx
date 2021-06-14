@@ -6,6 +6,7 @@ import {
   useMemo,
   useState
 } from "react";
+import {queries} from '../services/byprosQueries'
 import { AiFillMinusCircle } from "react-icons/ai";
 import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
 import { GiConfirmed } from "react-icons/gi";
@@ -234,14 +235,17 @@ const UserRights: FunctionComponent<{
             );
           })}
           {/* TODO add the function to add rights to a user */}
-          <NewAccessRight
+          
+        </PanelElement>
+      )}
+       <PanelElement last title="Add Access Rights">
+      <NewAccessRight
             setSuccess={setSuccess}
             userId={authorization.userid}
             authorization={authorization}
             instanceId={instanceId}
           />
-        </PanelElement>
-      )}
+       </PanelElement>
     </div>
   );
 };
@@ -354,8 +358,8 @@ const SelectedProject: FunctionComponent<{
       {
         Header: "Access Rights",
         accessor: "queryterms",
-        Cell: ({ value }: { value: any }) => {
-          return value.length;
+        Cell: ({ value }: { value?: any }) => {
+          if (value) {return value.length} else return 0
         },
       },
     ],
@@ -408,15 +412,17 @@ const SelectedProject: FunctionComponent<{
       <PanelElement title="Project Description">
         {selectedTransaction.project.description}
       </PanelElement>
-      {selectedTransaction.project.authorizations && (
-        <PanelElement title="Users" last>
-          {showNewUser ? (
+      <PanelElement title="Add a New User" last>
+      {showNewUser ? (
             <AddUser
               setShowNewUser={setShowNewUser}
               setSuccess={setSuccess}
               instanceId={hex2Bytes(selectedTransaction.instanceid)}
             />
-          ) : (
+          ) : <AddButton onClick={() => setShowNewUser(true)} />}
+      </PanelElement>
+      {selectedTransaction.project.authorizations && (
+        <PanelElement title="Users" last>
             <>
               <div className="flex">
                 <div className="inline-flex items-center p-2 text-primary-400">
@@ -516,12 +522,9 @@ const SelectedProject: FunctionComponent<{
                   </tbody>
                 </table>
               </div>
-              <PanelElement title="Add a New User" last>
-                <AddButton onClick={() => setShowNewUser(true)} />
-              </PanelElement>
-              {/* TODO add the function to add a user to the project*/}
+             
             </>
-          )}
+
         </PanelElement>
       )}
     </div>
@@ -537,20 +540,7 @@ const Projects: FunctionComponent = () => {
   useEffect(() => {
     var t0 = performance.now();
     const queryReplies = async () => {
-      const queryResults = await byprosQuery(`SELECT 
-    encode(cothority.instruction.contract_iid,'hex') as instanceid
-  FROM
-    cothority.instruction
-  INNER JOIN 
-    cothority.transaction 
-  ON
-    cothority.transaction.transaction_id = cothority.instruction.transaction_id
-  WHERE
-    cothority.instruction.type_id = 2
-  AND 
-    cothority.instruction.contract_name = 'project'
-  AND 
-    cothority.transaction.Accepted = TRUE`);
+      const queryResults = await byprosQuery(queries.projects);
       const results: Promise<ProjectContract>[] = queryResults.map(
         (result: { instanceid: string }) => {
           return getProject(result.instanceid);

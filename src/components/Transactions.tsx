@@ -4,6 +4,7 @@ import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import classes from "../classes/classes";
 import { ConnectionContext } from "../contexts/ConnectionContext";
+import { queries } from "../services/byprosQueries";
 import {
   byprosQuery,
   getDeferred,
@@ -232,52 +233,10 @@ const Transactions = () => {
   useEffect(() => {
     // getDeferredData('a81b8d76b6a1453728a211c3823afb3b3ff0e572e77358f3ebadd4860f9b68ca')
     // TODO embed query in file
-    byprosQuery(`SELECT
-    encode(cothority.instruction.contract_iid, 'hex') as instanceid
-  FROM
-    cothority.instruction
-  WHERE
-    cothority.instruction.contract_name = 'deferred' 
-  AND 
-    cothority.instruction.type_id = 2
-  AND
-    cothority.instruction.contract_iid 
-    NOT IN (
-      SELECT 
-        cothority.instruction.contract_iid
-      FROM
-        cothority.instruction
-      INNER JOIN 
-        cothority.transaction 
-      ON
-        cothority.transaction.transaction_id = cothority.instruction.transaction_id
-      WHERE
-        cothority.instruction.type_id = 3
-      AND 
-        cothority.instruction.contract_name = 'deferred'
-      AND 
-        cothority.instruction.Action = 'invoke:deferred.execProposedTx'
-      AND 
-        cothority.transaction.Accepted = TRUE
-    ) `).then((reply) => {
+    byprosQuery(queries.pendingTransactions).then((reply) => {
       setTransactionsData(reply.reverse());
     });
-    byprosQuery(`SELECT 
-    encode(cothority.instruction.contract_iid,'hex') as instanceid
-  FROM
-    cothority.instruction
-  INNER JOIN 
-    cothority.transaction 
-  ON
-    cothority.transaction.transaction_id = cothority.instruction.transaction_id
-  WHERE
-    cothority.instruction.type_id = 3
-  AND 
-    cothority.instruction.contract_name = 'deferred'
-  AND 
-    cothority.instruction.Action = 'invoke:deferred.execProposedTx'
-  AND 
-    cothority.transaction.Accepted = TRUE`).then((reply) => {
+    byprosQuery(queries.transactionsHistory).then((reply) => {
       setTransactionsHistoryData(reply.reverse());
     });
   }, [success]);
