@@ -24,10 +24,7 @@ const SelectedProject: FunctionComponent<{
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ selectedTransaction, setSuccess }) => {
   const [showNewUser, setShowNewUser] = useState(false);
-
   const { connection } = useContext(ConnectionContext);
-  const [error, setError] = useState("");
-  const [filterInput, setFilterInput] = useState("");
 
   useEffect(() => {}, [selectedTransaction]);
   return (

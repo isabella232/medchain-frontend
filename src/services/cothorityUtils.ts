@@ -2,7 +2,7 @@ import { Darc } from "@dedis/cothority/darc";
 import { SkipBlock } from "@dedis/cothority/skipchain";
 import { DataHeader } from "@dedis/cothority/byzcoin/proto";
 
-export const identityRe: RegExp = /ed25519\:[a-fA-F0-9]{64}/g;
+export const identityRe: RegExp = /ed25519:[a-fA-F0-9]{64}/g;
 export const multisigRe: RegExp = /\d+\/\d+/g;
 
 /**
@@ -31,8 +31,8 @@ export const getAdmins = (darc: Darc) => {
  * @param key The public key
  * @returns true if the key is valid, false otherwise
  */
-export const validateKey = (key: string): Boolean => {
-  const re: RegExp = /ed25519\:[a-fA-F0-9]{64}/;
+export const validateIdentity = (key: string): Boolean => {
+  const re: RegExp = /ed25519:[a-fA-F0-9]{64}/;
   return re.test(key);
 };
 /**
@@ -78,3 +78,13 @@ export function getTimeString(block: SkipBlock): string {
   const re: RegExp = /\d+\/\d+/;
   return re.test(rule);
 };
+/**
+ * Validate the public and private key expression
+ * @param key The public or private key
+ * @returns true if the key is valid, false otherwise
+ */
+ export const validateKeys = (rule: string): Boolean => {
+  const re: RegExp = /[a-fA-F0-9]{64}/;
+  return re.test(rule);
+};
+

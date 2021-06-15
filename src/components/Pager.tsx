@@ -1,8 +1,6 @@
 import classnames from "classnames";
 import { FunctionComponent, useEffect, useState } from "react";
-import { NextButton, PreviousButton } from "../components/Buttons";
-import { ProjectContract } from "../services/messages";
-import { formatHash } from "../tools/format";
+import { NextButton, PreviousButton } from "./Buttons";
 
 const TransactionLine: FunctionComponent<{
   transactionDetails: any;
@@ -12,7 +10,7 @@ const TransactionLine: FunctionComponent<{
   return (
     <button
       className={classnames(
-        "focus:outline-none shadow w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
+        "focus:outline-none font-mono shadow w-full px-8 py-2 rounded-lg text-sm hover:border-primary-400 border-2 border-transparent space-x-8 flex justify-between bg-white",
         selected && "border-primary-400"
       )}
       onClick={onClick}
@@ -90,7 +88,7 @@ export const ProjectsPager: FunctionComponent<{
   const [maxPage, setMaxPage] = useState(0);
 
   useEffect(() => {
-    console.log(data)
+    console.log(data);
     setMaxPage(Math.floor(data.length / 10));
   }, [data, page]);
   const nextPage = () => {
@@ -107,11 +105,13 @@ export const ProjectsPager: FunctionComponent<{
   return (
     <div className="space-y-2">
       {data?.slice(10 * page, 10 * page + 10).map((v: any) => {
-        return <ProjectLine
-          projectDetails={v}
-          onClick={() => setSelectedProject(v)}
-          selected={selectedProject === v}
-        />;
+        return (
+          <ProjectLine
+            projectDetails={v}
+            onClick={() => setSelectedProject(v)}
+            selected={selectedProject === v}
+          />
+        );
       })}
       <div className="space-x-2 flex mt-4">
         <PreviousButton onClick={(e) => previousPage()} />

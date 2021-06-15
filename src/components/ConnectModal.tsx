@@ -3,19 +3,23 @@ import { FunctionComponent, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import Modal from "react-modal";
 import { ConnectButton } from "../components/Buttons";
+import { ConnectionType } from "../contexts/ConnectionContext";
+import { validateKeys } from "../services/cothorityUtils";
+import Error, { ErrorMessage } from "./Error";
 
 const ConnectModal: FunctionComponent<{
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   modalIsOpen: boolean;
-  setConnection: any;
+  setConnection: (name: ConnectionType) => void;
 }> = ({ setIsOpen, modalIsOpen, setConnection }) => {
   const [privateKey, setPrivateKey] = useState<string>();
   const [publicKey, setPublicKey] = useState<string>();
+  const [error, setError] = useState<ErrorMessage | undefined>();
 
   return (
     <Modal
       isOpen={modalIsOpen}
-      className={"bg-white rounded-lg shadow-lg p-6 w-1/2 h-1/3"}
+      className={"bg-white rounded-lg shadow-lg p-6 w-1/2"}
       overlayClassName={classnames(
         "fixed inset-0",
         "flex flex-col items-center justify-center",
@@ -66,16 +70,26 @@ const ConnectModal: FunctionComponent<{
             )}
           />
         </div>
-        <ConnectButton
-          onClick={() => {
-            setIsOpen(false);
-            setConnection({
-              connected: true,
-              public: publicKey,
-              private: privateKey,
-            });
-          }}
-        />
+        {error && <Error errorMessage={error} reset={setError} />}
+        {publicKey && privateKey && (
+          <ConnectButton
+            onClick={() => {
+              if (!validateKeys(publicKey) || !validateKeys(privateKey)) {
+                setError({
+                  message: "Public or private key invalid",
+                  title: "Format error",
+                });
+                return;
+              }
+              setIsOpen(false);
+              setConnection({
+                connected: true,
+                public: `ed25519:${publicKey}`,
+                private: privateKey!,
+              });
+            }}
+          />
+        )}
       </div>
     </Modal>
   );

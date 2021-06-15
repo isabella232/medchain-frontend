@@ -2,7 +2,7 @@ import Darc from "@dedis/cothority/darc/darc";
 import { FunctionComponent, useContext, useState } from "react";
 import { ConnectionContext } from "../../contexts/ConnectionContext";
 import { sendTransaction } from "../../services/cothorityGateway";
-import { validateKey } from "../../services/cothorityUtils";
+import { validateIdentity } from "../../services/cothorityUtils";
 import {
   modifyAdminFromDarc,
   removeAdminFromDarc,
@@ -31,7 +31,7 @@ const ModifyAdmin: FunctionComponent<{
   };
 
   const confirm = () => {
-    if (!validateKey(newKey)) {
+    if (!validateIdentity(newKey)) {
       setError({
         message: "Not a valid public address",
         title: "Format Error",

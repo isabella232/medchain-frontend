@@ -1,4 +1,3 @@
-import classnames from "classnames";
 import { FunctionComponent, useContext, useState } from "react";
 import { FaExchangeAlt, FaUsers } from "react-icons/fa";
 import { GoProject } from "react-icons/go";
@@ -18,11 +17,11 @@ const SidebarNavLink: FunctionComponent<{
     <NavLink
       exact
       to={to}
-      className="block flex text-white items-center border-r-4 border-transparent hover:border-primary-200 hover:bg-primary-600 px-3 py-2"
+      className="block flex text-white font-bold items-center border-r-4 border-transparent hover:border-primary-200 hover:bg-primary-600 px-3 py-2"
       activeClassName="bg-primary-600 border-primary-200"
     >
       <Icon />
-      <span className="ml-2 text-xl">{title}</span>
+      <span className="ml-2 text-lg">{title}</span>
     </NavLink>
   );
 };
@@ -30,6 +29,7 @@ const SidebarNavLink: FunctionComponent<{
 const Sidebar = () => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
+  console.log(connection)
   return (
     <div className="w-52 flex flex-col h-full bg-primary-400">
       <h1 className="font-bold text-white text-2xl m-3">Medchain</h1>
@@ -45,7 +45,6 @@ const Sidebar = () => {
           <div className="flex flex-col">
             <ConnectModal modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} setConnection={setConnection}/>
             <ConnectButton
-              className={classnames("")}
               onClick={(e) => {
                 setIsOpen(true);
               }}
@@ -57,7 +56,6 @@ const Sidebar = () => {
               connection.public
             )}`}</p>
             <DisconnectButton
-              className={classnames("")}
               onClick={(e) => {
                 setConnection({ connected: false, public: "", private: "" });
               }}

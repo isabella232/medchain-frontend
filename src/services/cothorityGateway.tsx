@@ -47,7 +47,7 @@ export async function byprosQuery(sqlInput: string) {
   const query = new Query();
   query.query = sqlInput;
   const reply = await ws.send(query, QueryReply);
-  return eval((reply as QueryReply).result.toString());
+  return JSON.parse((reply as QueryReply).result.toString());
 }
 /**
  * Get the deferred transaction data given the instance ID of the deferred transaction

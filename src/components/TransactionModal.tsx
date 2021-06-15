@@ -1,9 +1,8 @@
-import { FunctionComponent, useState } from "react";
-import Modal from "react-modal";
 import classnames from "classnames";
+import { FunctionComponent } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
-import { ConnectButton } from "./Buttons";
-import { ExecuteButton, AbortButton } from "./Buttons";
+import Modal from "react-modal";
+import { AbortButton, ExecuteButton } from "./Buttons";
 
 const TransactionModal: FunctionComponent<{
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,14 +16,14 @@ const TransactionModal: FunctionComponent<{
   return (
     <Modal
       isOpen={modalIsOpen}
-      className={"bg-white rounded-lg shadow-lg p-6 w-1/2"}
+      className={"bg-white rounded-lg shadow-lg p-6 w-1/2 overflow-y-auto"}
       overlayClassName={classnames(
         "fixed inset-0",
         "flex flex-col items-center justify-center",
         "bg-white bg-opacity-80"
       )}
     >
-      <div className="flex">
+      <div className="flex ">
         <button
           onClick={() => {
             setIsOpen(false);

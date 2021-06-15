@@ -208,7 +208,6 @@ export const CopyButton: FunctionComponent<{
   className?: string;
   elem: string;
 }> = ({ className, elem }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipText, setTooltipText] = useState("Copy to clipboard");
 
   const copyToClipBoard = () => {
@@ -216,11 +215,7 @@ export const CopyButton: FunctionComponent<{
     setTooltipText("Copied!");
   };
 
-  const handleMouseEnter = () => {
-    setShowTooltip(true);
-  };
   const handleMouseLeave = () => {
-    setShowTooltip(false);
     setTooltipText("Copy to clipboard");
   };
 
@@ -232,17 +227,12 @@ export const CopyButton: FunctionComponent<{
       <div className="group cursor-pointer relative inline-block ml-2 text-center focus:outline-none">
         <FaCopy
           className="text-primary-400"
-          onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
         <div className="opacity-0 bg-primary-400 bg-opacity-50 text-white mb-1 text-center text-xs rounded-lg py-2 absolute z-10 group-hover:opacity-100 bottom-full -left-1/2 px-3 pointer-events-none">
           {tooltipText}
         </div>
       </div>
-      {/* <div className="w-28 bg-black bg-opacity-50 text-white text-center text-xs rounded-lg py-2 relative z-10 bottom-full -left-1/2 ml-14 px-3 pointer-events-none">
-        {tooltipText}
-        <svg className="absolute text-black text-opacity-50 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
-      </div> */}
     </button>
   );
 };
