@@ -118,7 +118,6 @@ export class DeferredData extends Message<DeferredData> {
   execresult: Buffer[] = [];
 
   toString(): string {
-    console.log(this.proposedtransaction);
     return `Deferred instance:
 - Proposed transaction: ${this.proposedtransaction.instructions[0]}
 - ExpireBlockIndex: ${this.expireblockindex}

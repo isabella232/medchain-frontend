@@ -150,7 +150,6 @@ const Transactions = () => {
   const [success, setSuccess] = useState("");
   useEffect(() => {
     byprosQuery(queries.pendingTransactions).then((reply) => {
-      console.log(reply)
       setTransactionsData(reply.reverse());
     });
     byprosQuery(queries.transactionsHistory).then((reply) => {

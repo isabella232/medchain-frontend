@@ -29,7 +29,6 @@ const SidebarNavLink: FunctionComponent<{
 const Sidebar = () => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
-  console.log(connection)
   return (
     <div className="w-52 flex flex-col h-full bg-primary-400">
       <h1 className="font-bold text-white text-2xl m-3">Medchain</h1>

@@ -70,7 +70,6 @@ export async function getDeferred(instanceid: string) {
 export async function getProject(instanceid: string):Promise<ProjectDetails> {
   const rpc = await getRPConnection();
   const proof = await rpc.getProof(hex2Bytes(instanceid));
-  console.log(proof.value);
   const project = ProjectContract.decode(Buffer.from(proof.value));
 
   return { instanceid: instanceid, project: project };

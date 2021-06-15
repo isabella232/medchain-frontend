@@ -28,9 +28,6 @@ const SelectedProject: FunctionComponent<{
   const [showNewUser, setShowNewUser] = useState(false);
   const { connection } = useContext(ConnectionContext);
 
-  useEffect(() => {
-    console.log(selectedProject);
-  }, [selectedProject]);
   return (
     <div className={classnames(classes.box)}>
       <PanelElement title="Project instance ID">
@@ -89,11 +86,6 @@ const Projects: FunctionComponent = () => {
       Promise.all(result)
         .then((res) => {
           setProjects(res);
-          console.log(res);
-          var t1 = performance.now();
-          console.log(
-            "Call to doSomething took " + (t1 - t0) + " milliseconds."
-          );
           setLoading(false);
         })
         .catch((err) => console.log(err));

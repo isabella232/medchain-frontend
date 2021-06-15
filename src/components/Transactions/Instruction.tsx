@@ -89,7 +89,6 @@ const Instruction: FunctionComponent<{
           {instructionData.invoke ? instructionData.invoke.command : "spawn"}
         </div>
       </PanelElement>
-      {console.log(instructionData)}
       <PanelElement
         title={`Arguments`}
       >
