@@ -103,20 +103,20 @@ const Projects: FunctionComponent = () => {
           >
             Projects
           </h2>
-          {loading ? (
-            <Spinner />
-          ) : (
-            <div className="space-y-4">
+          <div className="space-y-4">
+            {loading ? (
+              <Spinner />
+            ) : (
               <ProjectsPager
                 data={projects as ProjectDetails[]}
                 selectedProject={selectedProject!}
                 setSelectedProject={setSelectedProject}
               />
-              <PanelElement title="Add a New Project" last>
-                <NewProject setSuccess={setSuccess} connection={connection} />
-              </PanelElement>
-            </div>
-          )}
+            )}
+            <PanelElement title="Add a New Project" last>
+              <NewProject setSuccess={setSuccess} connection={connection} />
+            </PanelElement>
+          </div>
         </div>
         <div className="w-2/3 p-3">
           <h2
