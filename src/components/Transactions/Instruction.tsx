@@ -9,6 +9,7 @@ import { CopyButton, SignButton } from "../Buttons";
 import { ErrorMessage } from "../Error";
 import PanelElement from "../PanelElement";
 import SignModal from "./SignModal";
+import { TransactionQueryResponse } from "./transactionTypes";
 
 const Instruction: FunctionComponent<{
   instructionHash: Buffer;
@@ -18,7 +19,7 @@ const Instruction: FunctionComponent<{
   executed?: boolean;
   setError: React.Dispatch<React.SetStateAction<ErrorMessage | undefined>>;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedTransaction: any;
+  setSelectedTransaction: React.Dispatch<React.SetStateAction<TransactionQueryResponse | undefined>>;
 }> = ({
   instructionHash,
   instructionData,

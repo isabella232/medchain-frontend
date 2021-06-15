@@ -22,12 +22,13 @@ import Spinner from "../Spinner";
 import Success from "../Success";
 import TransactionModal from "../TransactionModal";
 import Instruction from "./Instruction";
+import {TransactionQueryResponse} from './transactionTypes'
 
 const SelectedTransaction: FunctionComponent<{
-  selectedTransaction: any;
-  setSelectedTransaction: any;
-  success: any;
-  setSuccess: any;
+  selectedTransaction: TransactionQueryResponse;
+  setSelectedTransaction: React.Dispatch<React.SetStateAction<TransactionQueryResponse | undefined>>;
+  success: string;
+  setSuccess: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ selectedTransaction, setSelectedTransaction, success, setSuccess }) => {
   const [executeModalIsOpen, setExecuteModal] = useState(false);
   const [transactionData, setTransactionData] = useState<DeferredData>();
@@ -58,7 +59,6 @@ const SelectedTransaction: FunctionComponent<{
   };
 
   useEffect(() => {
-    console.log(selectedTransaction);
     setTransactionData(undefined);
     getDeferred(selectedTransaction.instanceid)
       .then((result) => {
@@ -150,6 +150,7 @@ const Transactions = () => {
   const [success, setSuccess] = useState("");
   useEffect(() => {
     byprosQuery(queries.pendingTransactions).then((reply) => {
+      console.log(reply)
       setTransactionsData(reply.reverse());
     });
     byprosQuery(queries.transactionsHistory).then((reply) => {
@@ -157,7 +158,7 @@ const Transactions = () => {
     });
   }, [success]);
 
-  const [selectedTransaction, setSelectedTransaction] = useState<any>();
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionQueryResponse>();
   return (
     <PageLayout title="Transactions" icon={FaExchangeAlt}>
       <nav className={classnames(classes.nav)}>
@@ -191,13 +192,13 @@ const Transactions = () => {
           {viewIndex === 0 ? (
             <Pager
               data={transactionsData}
-              selectedTransaction={selectedTransaction}
+              selectedTransaction={selectedTransaction!}
               setSelectedTransaction={setSelectedTransaction}
             />
           ) : (
             <Pager
               data={transactionsHistoryData}
-              selectedTransaction={selectedTransaction}
+              selectedTransaction={selectedTransaction!}
               setSelectedTransaction={setSelectedTransaction}
             />
           )}

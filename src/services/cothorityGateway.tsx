@@ -2,6 +2,7 @@ import { ByzCoinRPC, ClientTransaction } from "@dedis/cothority/byzcoin";
 import { Darc, SignerEd25519 } from "@dedis/cothority/darc";
 import { Roster, WebSocketConnection } from "@dedis/cothority/network/index";
 import { SkipBlock, SkipchainRPC } from "@dedis/cothority/skipchain";
+import { ProjectDetails } from "./CothorityTypes";
 import { hex2Bytes } from "./cothorityUtils";
 import { DeferredData, ProjectContract, Query, QueryReply } from "./messages";
 import { getByzcoinID, getRosterStr } from "./roster";
@@ -66,7 +67,7 @@ export async function getDeferred(instanceid: string) {
  * @param instanceid The instance ID of the project contract
  * @returns Project data
  */
-export async function getProject(instanceid: string) {
+export async function getProject(instanceid: string):Promise<ProjectDetails> {
   const rpc = await getRPConnection();
   const proof = await rpc.getProof(hex2Bytes(instanceid));
   console.log(proof.value);

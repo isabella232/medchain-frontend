@@ -5,8 +5,8 @@ import classes from "../../classes/classes";
 import { ConnectionContext } from "../../contexts/ConnectionContext";
 import { queries } from "../../services/byprosQueries";
 import { byprosQuery, getProject } from "../../services/cothorityGateway";
+import { ProjectDetails } from "../../services/CothorityTypes";
 import { hex2Bytes } from "../../services/cothorityUtils";
-import { ProjectContract } from "../../services/messages";
 import { AddButton, CopyButton } from "../Buttons";
 import PageLayout from "../PageLayout";
 import { ProjectsPager } from "../Pager";
@@ -18,44 +18,48 @@ import NewProject from "./NewProject";
 import UserTable from "./userTable";
 
 const SelectedProject: FunctionComponent<{
-  selectedTransaction: any;
-  setSelectedTransaction: any;
-  success: any;
+  selectedProject: ProjectDetails;
+  setSelectedProject: React.Dispatch<
+    React.SetStateAction<ProjectDetails | undefined>
+  >;
+  success: string;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ selectedTransaction, setSuccess }) => {
+}> = ({ selectedProject, setSelectedProject, setSuccess }) => {
   const [showNewUser, setShowNewUser] = useState(false);
   const { connection } = useContext(ConnectionContext);
 
-  useEffect(() => {}, [selectedTransaction]);
+  useEffect(() => {
+    console.log(selectedProject);
+  }, [selectedProject]);
   return (
     <div className={classnames(classes.box)}>
-      <PanelElement title="Transaction instance ID">
-        {selectedTransaction.instanceid}
-        <CopyButton elem={selectedTransaction.instanceid} />
+      <PanelElement title="Project instance ID">
+        {selectedProject.instanceid}
+        <CopyButton elem={selectedProject.instanceid} />
       </PanelElement>
       <PanelElement title="Project Name">
-        {selectedTransaction.project.name}
+        {selectedProject.project.name}
       </PanelElement>
       <PanelElement title="Project Description">
-        {selectedTransaction.project.description}
+        {selectedProject.project.description}
       </PanelElement>
       <PanelElement title="Add a New User" last>
         {showNewUser ? (
           <AddUser
             setShowNewUser={setShowNewUser}
             setSuccess={setSuccess}
-            instanceId={hex2Bytes(selectedTransaction.instanceid)}
+            instanceId={hex2Bytes(selectedProject.instanceid)}
           />
         ) : (
           <AddButton onClick={() => setShowNewUser(true)} />
         )}
       </PanelElement>
-      {selectedTransaction.project.authorizations && (
+      {selectedProject.project.authorizations && (
         <PanelElement title="Users" last>
           <UserTable
             connection={connection}
             setSuccess={setSuccess}
-            selectedTransaction={selectedTransaction}
+            selectedProject={selectedProject}
           />
         </PanelElement>
       )}
@@ -64,16 +68,17 @@ const SelectedProject: FunctionComponent<{
 };
 
 const Projects: FunctionComponent = () => {
-  const [projects, setProjects] = useState<ProjectContract[]>([]);
+  const [projects, setProjects] = useState<ProjectDetails[]>([]);
   const [success, setSuccess] = useState("");
-  const [selectedProject, setSelectedProject] = useState<any>();
+  const [selectedProject, setSelectedProject] =
+    useState<ProjectDetails | undefined>();
   const [loading, setLoading] = useState<boolean>(true);
   const { connection } = useContext(ConnectionContext);
   useEffect(() => {
     var t0 = performance.now();
     const queryReplies = async () => {
       const queryResults = await byprosQuery(queries.projects);
-      const results: Promise<ProjectContract>[] = queryResults.map(
+      const results: Promise<ProjectDetails>[] = queryResults.map(
         (result: { instanceid: string }) => {
           return getProject(result.instanceid);
         }
@@ -111,8 +116,8 @@ const Projects: FunctionComponent = () => {
           ) : (
             <div className="space-y-4">
               <ProjectsPager
-                data={projects as any}
-                selectedProject={selectedProject}
+                data={projects as ProjectDetails[]}
+                selectedProject={selectedProject!}
                 setSelectedProject={setSelectedProject}
               />
               <PanelElement title="Add a New Project" last>
@@ -131,8 +136,8 @@ const Projects: FunctionComponent = () => {
           </h2>
           {selectedProject !== undefined && (
             <SelectedProject
-              selectedTransaction={selectedProject}
-              setSelectedTransaction={setSelectedProject}
+              selectedProject={selectedProject}
+              setSelectedProject={setSelectedProject}
               success={success}
               setSuccess={setSuccess}
             />

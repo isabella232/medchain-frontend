@@ -1,10 +1,12 @@
 import classnames from "classnames";
 import { FunctionComponent, useEffect, useState } from "react";
+import { ProjectDetails } from "../services/CothorityTypes";
 import { NextButton, PreviousButton } from "./Buttons";
+import { TransactionQueryResponse } from "./Transactions/transactionTypes";
 
 const TransactionLine: FunctionComponent<{
-  transactionDetails: any;
-  onClick: any;
+  transactionDetails: TransactionQueryResponse;
+  onClick: () => void;
   selected?: boolean;
 }> = ({ transactionDetails, onClick, selected }) => {
   return (
@@ -21,9 +23,11 @@ const TransactionLine: FunctionComponent<{
 };
 
 const Pager: FunctionComponent<{
-  data: any[];
-  setSelectedTransaction: any;
-  selectedTransaction: any;
+  data: TransactionQueryResponse[];
+  setSelectedTransaction: React.Dispatch<
+    React.SetStateAction<TransactionQueryResponse | undefined>
+  >;
+  selectedTransaction: TransactionQueryResponse;
 }> = ({ data, setSelectedTransaction, selectedTransaction }) => {
   const [page, setPage] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
@@ -62,8 +66,8 @@ const Pager: FunctionComponent<{
 };
 
 const ProjectLine: FunctionComponent<{
-  projectDetails: any;
-  onClick: any;
+  projectDetails: ProjectDetails;
+  onClick: () => void;
   selected?: boolean;
 }> = ({ projectDetails, onClick, selected }) => {
   return (
@@ -80,9 +84,11 @@ const ProjectLine: FunctionComponent<{
 };
 
 export const ProjectsPager: FunctionComponent<{
-  data: any[];
-  setSelectedProject: any;
-  selectedProject: any;
+  data: ProjectDetails[];
+  setSelectedProject: React.Dispatch<
+    React.SetStateAction<ProjectDetails | undefined>
+  >;
+  selectedProject: ProjectDetails;
 }> = ({ data, setSelectedProject, selectedProject }) => {
   const [page, setPage] = useState(0);
   const [maxPage, setMaxPage] = useState(0);

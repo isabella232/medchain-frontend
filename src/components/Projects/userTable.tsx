@@ -1,17 +1,18 @@
 import classnames from "classnames";
 import { FunctionComponent, useMemo, useState } from "react";
 import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
-import { useExpanded, useFilters, useSortBy, useTable } from "react-table";
+import { useExpanded, useFilters, useSortBy, useTable, } from "react-table";
 import { ConnectionType } from "../../contexts/ConnectionContext";
+import { ProjectDetails } from "../../services/CothorityTypes";
 import { hex2Bytes } from "../../services/cothorityUtils";
 import { tableColumns } from "./columns";
 import UserRights from "./UserRights";
 
 const UserTable: FunctionComponent<{
-  selectedTransaction: any;
+  selectedProject: ProjectDetails;
   setSuccess: React.Dispatch<React.SetStateAction<string>>;
   connection: ConnectionType;
-}> = ({ setSuccess, selectedTransaction, connection }) => {
+}> = ({ setSuccess, selectedProject, connection }) => {
   const [filterInput, setFilterInput] = useState("");
   const columns = useMemo(() => tableColumns, []);
   const handleFilterChange = (e: any) => {
@@ -20,8 +21,8 @@ const UserTable: FunctionComponent<{
     setFilterInput(value);
   };
   const data = useMemo(
-    () => selectedTransaction.project.authorizations || [],
-    [selectedTransaction]
+    () => selectedProject.project.authorizations || [],
+    [selectedProject]
   );
 
   const {
@@ -127,7 +128,7 @@ const UserTable: FunctionComponent<{
                           authorization={row.original}
                           setSuccess={setSuccess}
                           connection={connection}
-                          instanceId={hex2Bytes(selectedTransaction.instanceid)}
+                          instanceId={hex2Bytes(selectedProject.instanceid)}
                         />
                       </td>
                     </tr>
