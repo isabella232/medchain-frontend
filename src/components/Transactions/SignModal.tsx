@@ -42,38 +42,42 @@ const SignModal: FunctionComponent<{
           {instructionData.invoke ? instructionData.invoke.command : "spawn"}
         </div>
       </PanelElement>
-      <PanelElement
-        title={`Arguments`}
-      >
-        {
-            instructionData.invoke? 
-                instructionData.invoke.contractID === 'darc'?
-                instructionData.invoke.command === 'evolve' && 
-                    <div>
-                        {Darc.decode(instructionData.invoke.args[0].value).toString()}
-                    </div>
-                :
-                instructionData.invoke.contractID === 'project' && 
-                <>
+      <PanelElement title={`Arguments`}>
+        {instructionData.invoke ? (
+          instructionData.invoke.contractID === "darc" ? (
+            instructionData.invoke.command === "evolve" && (
+              <div>
+                {Darc.decode(instructionData.invoke.args[0].value).toString()}
+              </div>
+            )
+          ) : (
+            instructionData.invoke.contractID === "project" && (
+              <>
                 <div>
-                    <span className="font-bold mr-2">UserID:</span>{instructionData.invoke.args[0].value.toString()}
+                  <span className="font-bold mr-2">UserID:</span>
+                  {instructionData.invoke.args[0].value.toString()}
                 </div>
                 <div>
-                    <span className="font-bold mr-2">Query term:</span>{instructionData.invoke.args[1].value.toString()}
+                  <span className="font-bold mr-2">Query term:</span>
+                  {instructionData.invoke.args[1].value.toString()}
                 </div>
-                </>
-            :
-            <div>
-                <>
-                <div>
-                    <span className="font-bold mr-2">Description:</span>{instructionData.spawn.args[0].value.toString()}
-                </div>
-                <div>
-                    <span className="font-bold mr-2">Project Name:</span>{instructionData.spawn.args[1].value.toString()}
-                </div>
-                </>
-            </div>
-        }
+              </>
+            )
+          )
+        ) : (
+          <div>
+            <>
+              <div>
+                <span className="font-bold mr-2">Description:</span>
+                {instructionData.spawn.args[0].value.toString()}
+              </div>
+              <div>
+                <span className="font-bold mr-2">Project Name:</span>
+                {instructionData.spawn.args[1].value.toString()}
+              </div>
+            </>
+          </div>
+        )}
       </PanelElement>
       <PanelElement title="Signatures" last>
         <div>
@@ -86,4 +90,4 @@ const SignModal: FunctionComponent<{
   );
 };
 
-export default SignModal
+export default SignModal;
