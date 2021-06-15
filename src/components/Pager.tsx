@@ -94,7 +94,6 @@ export const ProjectsPager: FunctionComponent<{
   const [maxPage, setMaxPage] = useState(0);
 
   useEffect(() => {
-    console.log(data);
     setMaxPage(Math.floor(data.length / 10));
   }, [data, page]);
   const nextPage = () => {

@@ -28,7 +28,6 @@ const Admin = () => {
   useEffect(() => {
     getDarc().then((darc) => {
       setDarc(darc);
-      console.log(darc);
       setAdmins(getAdmins(darc) as string[]);
     });
   }, [success]);

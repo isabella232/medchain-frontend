@@ -31,7 +31,6 @@ const NewProject: FunctionComponent<{
     sendTransaction(tx, connection.private)
       .then((res) => {
         setSuccess(res);
-        console.log(res);
       })
       .catch((err) => console.log(err));
   };
