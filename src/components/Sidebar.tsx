@@ -1,12 +1,18 @@
+import { Roster } from "@dedis/cothority/network";
 import { FunctionComponent, useContext, useState } from "react";
 import { FaExchangeAlt, FaUsers } from "react-icons/fa";
 import { GoProject } from "react-icons/go";
 import { IconType } from "react-icons/lib";
 import { NavLink } from "react-router-dom";
-import { ConnectButton, DisconnectButton } from "../components/Buttons";
+import { ConnectButton, DisconnectButton, FollowButton } from "../components/Buttons";
 import { ConnectionContext } from "../contexts/ConnectionContext";
+import { byprosFollow } from "../services/cothorityGateway";
+import { EmptyReply } from "../services/messages";
+import { getRosterStr } from "../services/roster";
 import { formatAccountName } from "../tools/format";
 import ConnectModal from "./ConnectModal";
+import Error, { ErrorMessage } from "./Error";
+import Success from "./Success";
 
 const SidebarNavLink: FunctionComponent<{
   icon: IconType;
@@ -29,8 +35,21 @@ const SidebarNavLink: FunctionComponent<{
 const Sidebar = () => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState<ErrorMessage|undefined>(undefined);
+  const followBypros = () => {
+    byprosFollow().then(
+      (reply: EmptyReply) => {
+        setSuccess('Started following ' + Roster.fromTOML(getRosterStr()).list[0].getWebSocketAddress())
+      }
+    ).catch(err => {
+      console.log(err)
+    })
+  }
   return (
     <div className="w-52 flex flex-col h-full bg-primary-400">
+      <Success title="Succesfull connection" success={success}
+        setSuccess={setSuccess}/>
       <h1 className="font-bold text-white text-2xl m-3">Medchain</h1>
       <SidebarNavLink icon={FaUsers} title="Admins" to="/admins" />
       <SidebarNavLink
@@ -40,6 +59,8 @@ const Sidebar = () => {
       />
       <SidebarNavLink icon={GoProject} title="Projects" to="/projects" />
       <div className="flex flex-col mt-auto mb-4 px-3">
+        <FollowButton
+        onClick={followBypros}/>
         {!connection.connected ? (
           <div className="flex flex-col">
             <ConnectModal modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} setConnection={setConnection}/>

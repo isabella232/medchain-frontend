@@ -1,8 +1,8 @@
 export function getByzcoinID() {
-  return `ce98bc8acdf8b121d75cd6aabd939603b060984523ce82eb6d5d7d7b3bed4038`
+  return `3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb`
 }
 export function getDarcID() {
-  return `9ff9717717661914153e70569ae8e6a4cca81baeedb42c071995f27d6f57ecf4`
+  return `08cc267ced3d8d248e351d6f8f33f3962020e082cf01a960da08279b9bb91d60`
 }
 
 // Replace the roster with yours
@@ -43,5 +43,6 @@ export function getRosterStr () {
     [servers.Services.Skipchain]
       Public = "7475e8a9c812136383def1ada3e83171f5727470a0acf53798f923407c62c3a03ce8b7ef6f1b603e24101576cb69c5087e010a7582abb53a390e492e88f06953537cedc5cbfa966403dfd44f256e39e4a3350430f5bde033ab9ffad3c6919a963bb91e1e68781ebad0d68c35d19cae287d2a4f76cdc8208f21f01ecfb34bb13e"
       Suite = "bn256.adapter"
+
 `
 }

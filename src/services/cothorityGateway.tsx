@@ -4,7 +4,14 @@ import { Roster, WebSocketConnection } from "@dedis/cothority/network/index";
 import { SkipBlock, SkipchainRPC } from "@dedis/cothority/skipchain";
 import { ProjectDetails } from "./CothorityTypes";
 import { hex2Bytes } from "./cothorityUtils";
-import { DeferredData, ProjectContract, Query, QueryReply } from "./messages";
+import {
+  DeferredData,
+  EmptyReply,
+  Follow,
+  ProjectContract,
+  Query,
+  QueryReply
+} from "./messages";
 import { getByzcoinID, getRosterStr } from "./roster";
 
 /**
@@ -67,7 +74,7 @@ export async function getDeferred(instanceid: string) {
  * @param instanceid The instance ID of the project contract
  * @returns Project data
  */
-export async function getProject(instanceid: string):Promise<ProjectDetails> {
+export async function getProject(instanceid: string): Promise<ProjectDetails> {
   const rpc = await getRPConnection();
   const proof = await rpc.getProof(hex2Bytes(instanceid));
   const project = ProjectContract.decode(Buffer.from(proof.value));
@@ -99,4 +106,22 @@ export async function sendTransaction(tx: ClientTransaction, sk: string) {
   tx.signWith([[signer]]);
   await rpc.sendTransactionAndWait(tx);
   return tx.instructions[0].deriveId().toString("hex");
+}
+/**
+ * Ask the bypros proxy to follow the Byzcoin chain
+ */
+export function byprosFollow() {
+  const roster: Roster = Roster.fromTOML(getRosterStr());
+  const ws = new WebSocketConnection(
+    roster.list[0].getWebSocketAddress(),
+    "ByzcoinProxy"
+  );
+
+  const skipchain = getByzcoinID();
+
+  const msg = new Follow();
+  msg.scid = hex2Bytes(skipchain);
+  msg.target = roster.list[0];
+
+  return ws.send(msg, EmptyReply);
 }

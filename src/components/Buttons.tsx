@@ -11,6 +11,7 @@ import {
   FaSignature,
   FaWrench,
   FaCopy,
+  FaServer
 } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 
@@ -199,6 +200,23 @@ export const PreviousButton: FunctionComponent<{
       )}
       icon={FaArrowLeft}
       text="back"
+      onClick={onClick}
+    />
+  );
+};
+
+export const FollowButton: FunctionComponent<{
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}> = ({ className, onClick }) => {
+  return (
+    <ButtonBase
+      className={classnames(
+        "text-white bg-blue-400 hover:bg-blue-600",
+        className
+      )}
+      icon={FaServer}
+      text="Follow"
       onClick={onClick}
     />
   );

@@ -190,7 +190,7 @@ bcadmin info
 -- ByzCoinID: 3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb
 -- AdminDarc: 08cc267ced3d8d248e351d6f8f33f3962020e082cf01a960da08279b9bb91d60
 -- Identity: ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
-- BC: /Users/jean/Library/Application Support/bcadmin/data/bc-3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb.cfg
+- BC: path/to/.../bcadmin/data/bc-3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb.cfg
 ```
 
 ### 3.2.3. npm run start to start the application
@@ -198,6 +198,33 @@ bcadmin info
 ```sh
 npm run start
 ```
+
+Once you started the project, you need to register the public and private key in order to interact with the chain. You need to click on the connect button of the app and register the keys.
+
+You find the keys by using `bcadmin`. Get the info of Byzcoin first to get the identity of the first administrator generated when configuring the chain:
+
+```sh
+bcadmin info
+- Config:
+-- Roster:
+--- tls://localhost:7774
+--- tls://localhost:7772
+--- tls://localhost:7770
+-- ByzCoinID: 3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb
+-- AdminDarc: 08cc267ced3d8d248e351d6f8f33f3962020e082cf01a960da08279b9bb91d60
+-- Identity: ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
+- BC: path/to/.../bcadmin/data/bc-3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb.cfg
+```
+
+And then get the public and private key pair
+
+```sh
+bcadmin key -print /path/to/.../bcadmin/data/key-ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f.cfg
+Private: ec553855272bb591cf1d32753baf44cbac75ec57513a771537aad157c2088706
+Public: 936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
+```
+
+Then you need to ask Bypros to follow the Byzcoin roster (for the queries to run). You only need to do it once for every restart of the bypros docker containers.
 
 ### 3.2.4. Build the project
 

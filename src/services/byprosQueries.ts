@@ -1,3 +1,7 @@
+import { WebSocketConnection } from "@dedis/cothority/network"
+import { hex2Bytes } from "./cothorityUtils"
+import { Follow } from "./messages"
+
 export const queries = {
     projects:`SELECT 
     encode(cothority.instruction.contract_iid,'hex') as instanceid
