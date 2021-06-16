@@ -1,6 +1,7 @@
 # !/bin/bash
 
 GREEN='\033[1;32m'
+DARK_GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
@@ -37,30 +38,30 @@ echo "ICBfXyAgX18gICAgICAgICAgXyAgICAgIF8gICAgICAgICAgIF8gICAgICAgICAgICAgICAgIC
 echo "${NC}"
 
 echo "${GREEN}## setting up rules for evolving the administration darc ##${NC}"
-echo "Adding rule invoke:darc.evolve"
+echo "${DARK_GREEN}Adding rule invoke:darc.evolve${NC}"
 bcadmin darc rule --rule invoke:darc.evolve -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" &
 show_spinner "$!"
 echo
 
 echo "${GREEN}## setting up rules for spawning deferred transactions ##${NC}"
-echo "Adding rule spawn:deferred"
+echo "${DARK_GREEN}Adding rule spawn:deferred${NC}"
 bcadmin darc rule --rule spawn:deferred -id "${BC_ADMIN_ID}" &
 show_spinner "$!"
-echo "Adding rule invoke:deferred.addProof"
+echo "${DARK_GREEN}Adding rule invoke:deferred.addProof${NC}"
 bcadmin darc rule --rule invoke:deferred.addProof -id "${BC_ADMIN_ID}" &
 show_spinner "$!"
-echo "Adding rule invoke:deferred.execProposedTx"
+echo "${DARK_GREEN}Adding rule invoke:deferred.execProposedTx${NC}"
 bcadmin darc rule --rule invoke:deferred.execProposedTx -id "${BC_ADMIN_ID}" &
 show_spinner "$!"
 echo
 
 echo "${GREEN}## setting up rules for spawning projects contracts ##${NC}"
-echo "Adding rule spawn:project"
+echo "${DARK_GREEN}Adding rule spawn:project${NC}"
 bcadmin darc rule --rule spawn:project -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" &
 show_spinner "$!"
-echo "Adding rule invoke:project.add"
+echo "${DARK_GREEN}Adding rule invoke:project.add${NC}"
 bcadmin darc rule --rule invoke:project.add -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" &
 show_spinner "$!"
-echo "Adding rule invoke:project.remove"
+echo "${DARK_GREEN}Adding rule invoke:project.remove${NC}"
 bcadmin darc rule --rule invoke:project.remove -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" &
 show_spinner "$!"

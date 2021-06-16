@@ -1,4 +1,4 @@
-# Medchain Administration UI
+# 1. Medchain Administration UI
 
 The project goal was to create an administration interface for the access control and auditability system [MedChain](https://github.com/ldsec/medchain). 
     
@@ -6,13 +6,38 @@ By using the administration interface, administrators are able to collectively g
     
 The administration interface developed during this project is operational and can already be deployed in the MedChain ecosystem. Some improvements and iterations will probably be needed in the future to increase performances and user experience. The application is very lightweight and operates at a low level of abstraction with the underlying Byzcoin data store. This will ease the addition of features in the future.
 
-## Setup
+# 2. Table of Content
+
+- [1. Medchain Administration UI](#1-medchain-administration-ui)
+- [2. Table of Content](#2-table-of-content)
+- [3. Setup](#3-setup)
+  - [3.1. Setup a Byzcoin chain](#31-setup-a-byzcoin-chain)
+    - [3.1.1. Install medchain](#311-install-medchain)
+    - [3.1.2. Start the byzcoin chain](#312-start-the-byzcoin-chain)
+  - [3.2. Setup the app](#32-setup-the-app)
+    - [3.2.1. Install all the dependencies](#321-install-all-the-dependencies)
+    - [3.2.2. Add the correct roster file](#322-add-the-correct-roster-file)
+    - [3.2.3. npm run start to start the application](#323-npm-run-start-to-start-the-application)
+    - [3.2.4. Build the project](#324-build-the-project)
+- [4. Organization](#4-organization)
+  - [4.1. Classes](#41-classes)
+  - [4.2. Components](#42-components)
+    - [4.2.1. Administration](#421-administration)
+    - [4.2.2. Projects](#422-projects)
+    - [4.2.3. Transactions](#423-transactions)
+    - [4.2.4. Other components](#424-other-components)
+  - [4.3. Services](#43-services)
+  - [4.4. Hooks](#44-hooks)
+  - [4.5. Packages](#45-packages)
+  - [4.6. Limitations](#46-limitations)
+  
+# 3. Setup
 
 Below we detail how you can setup a local roster of nodes running a Byzcoin blockchain.
 
-### Setup a Byzcoin chain
+## 3.1. Setup a Byzcoin chain
 
-#### Inatall medchain
+### 3.1.1. Install medchain
 
 **You need to have the latest version of the Medchain administration cothority service**
 
@@ -24,7 +49,7 @@ cd medchain
 
 -----------
 
-#### Start the byzcoin chain
+### 3.1.2. Start the byzcoin chain
 
 **Install bcadmin, the byzcoin CLI**
 
@@ -137,29 +162,44 @@ Once done you have the byzcoin genesis DARC setup to have all the rules needed f
 
 ---------
 
-### Setup the app
+## 3.2. Setup the app
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), and the typescript template.
 
-#### Install all the dependencies
+### 3.2.1. Install all the dependencies
 
 ```sh
 npm install
 ```
 
-#### Add the correct roster file
+### 3.2.2. Add the correct roster file
 
-You first need to update `/src/services/roster.ts` to the correct roster, which can be found in conode/tmp/public.toml if you followed the instructions above.
+You first need to update `/src/services/roster.ts` to the correct roster, which can be found in `conode/tmp/public.toml` if you followed the instructions above.
 
+You also want to copy the ID of the genesis DARC and the ByzcoinID into the `/src/services/roster.ts` file. 
 
-#### npm run start to start the application
+```sh
+# Tells bcadmin about the new skipchain configuration
+bcadmin info
+- Config:
+-- Roster:
+--- tls://localhost:7774
+--- tls://localhost:7772
+--- tls://localhost:7770
+-- ByzCoinID: 3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb
+-- AdminDarc: 08cc267ced3d8d248e351d6f8f33f3962020e082cf01a960da08279b9bb91d60
+-- Identity: ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
+- BC: /Users/jean/Library/Application Support/bcadmin/data/bc-3db1f3a8ebba3bc83009ae2daa12455b1d88b2e00b399abd7f101ec9483a6afb.cfg
+```
+
+### 3.2.3. npm run start to start the application
 
 ```sh
 npm run start
 ```
 
-#### Build the project
+### 3.2.4. Build the project
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
@@ -169,3 +209,64 @@ It correctly bundles React in production mode and optimizes the build for the be
 npm run build
 ```
 
+
+
+# 4. Organization
+
+## 4.1. Classes
+
+`classes.ts` export an object that defines CSS classes, for reusability of certain classes accross multiple components.
+
+## 4.2. Components
+
+### 4.2.1. Administration
+
+Contains all the components of the Administration page
+
+### 4.2.2. Projects
+
+Contains all the components of the Projects page
+
+### 4.2.3. Transactions
+
+Contains all the components of the Transactions page
+
+### 4.2.4. Other components
+
+- `Buttons.tsx` defines the buttons of the application
+- `ConnectModal.tsx` defines the modal for the connection (register of the public and private key pair)
+- `Error.tsx` defines the error message component
+- `PageLayout.tsx` is an outer order component that defines the wireframe for any page of the application
+- `Pager.tsx` defines the pagination for the transactions page
+- `PanelElement` defines a section of a box in the UI
+- `Success.tsx` defines the success message component
+
+## 4.3. Services
+
+Contains all the different services used to communicate and manipulate the data of the app.
+
+- `byprosQueries.ts` contains Bypros sql queries definitions
+- `CothorityGateway.tsx` contains methods to communicate with Byzcoin.
+- `CothorityTypes.ts` defines certain types used to wrap Cothority objects and used in the application
+- `cothorityUtils.ts` contains helper methods for the different services.
+- `instructionBuilder.ts` contains methods that prepare transaction for the `CothorityGateway.tsx`
+- `messages.ts` contains protobuf to Typescript message definition. These messages are used to unmarshall data from Byzcoin.
+- `roster.ts` contains all the connection details about the roster of conodes and the configuration of Byzcoin.
+
+## 4.4. Hooks
+
+`useLocalStorage.tsx` this hook is used by the `ConnectionContext` to store the public adn private key pair in the local storage of the web browser. 
+> Note that this is a limitation. [see below](#limitations)
+  
+## 4.5. Packages
+
+- [**TailwindCSS**](https://tailwindcss.com/): The CSS framework used for creating the styling of the project. The file `tailwind.config.js` is used to personalized the framework to add special styling and extend existing styles.
+  > The documentation is incredible, you search anything in the search bar and you have all the different classes that you can use.
+- [**React Tables**](https://react-table.tanstack.com/): Create tables with add-on functionalities like sorting, filtering...
+- [**classnames**](https://www.npmjs.com/package/classnames) This package is usefull to separate the logic of the different classes you import. 
+- [**@dedis/cothority**](https://www.npmjs.com/package/@dedis/cothority) package that provides methods used to communicate with Byzcoin
+- [**React Icons**](https://react-icons.github.io/react-icons) used to import icons in the application. This package is just a repository of most of the famous SVG libraries. You just import the icon in the component and during the build of the project for production it will include the SVG in the final build.
+
+## 4.6. Limitations
+
+Note that this is a limitation. For production environment, this setup provide no security if the private key. A solution would be to encrypt the private key and store the ciphertext in a JSON file. And decrypt at runtime asking for the password of the administrator.
