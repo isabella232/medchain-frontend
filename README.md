@@ -56,14 +56,14 @@ cd medchain
 The Byzcoin CLI allows you to interact with the byzcoin blockchain with a low level of overhead.
 
 ```sh
-git clone https://github.com/dedis/cothority
+git clone https://github.com/dedis/cothority.git
 cd cothority/byzcoin/bcadmin
 go install
 ```
 
 **Start the proxy**
 
-The Bypros proxy allows you to fetch data from Byzcoin by sending SQL queries to the Bypros proxy server.
+The Bypros proxy allows you to fetch data from Byzcoin by sending SQL queries to the Bypros proxy server. Still in the Medchain repository you need to lauch the Bypros service by running:
 
 ```sh
 cd bypros
@@ -93,22 +93,7 @@ This command will setup 3 nodes and save their files in conode/tmp.
 Once the nodes are running, you may want to create a new skipchain, and perform
 basic operations like updating the DARC. This can be done with
 [bcadmin](https://github.com/dedis/cothority/tree/master/byzcoin/bcadmin), the
-Byzcoin CLI:
-
-```sh
-# Tells bcadmin where the config folder is
-BC_CONFIG=conode/tmp 
-# Create a new skipchain
-bcadmin create $BC_CONFIG/public.toml
-# Tells bcadmin about the new skipchain configuration
-export BC=...
-# Print the skipchain info, useful to perform some operations later on
-bcadmin info
-# Print the admin key, which is stored at the same place specified by BC
-bcadmin key -print .../key-ed25519\:...
-# Add a DARC rule, the id can be found with 'bcadmin info'
-bcadmin darc rule -rule spawn:project -id ed25519:...
-```
+Byzcoin CLI.
 
 We created a script that allow you to setup the Byzcoin DARC to be ready for running the administration interface.
 
@@ -116,7 +101,7 @@ If you did not already created a new skipchain running
 
 ```sh
 # Tells bcadmin where the config folder is
-BC_CONFIG=conode/tmp 
+export BC_CONFIG=conode/tmp 
 # Create a new skipchain
 bcadmin create $BC_CONFIG/public.toml
 ```

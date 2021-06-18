@@ -72,7 +72,6 @@ const Projects: FunctionComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const { connection } = useContext(ConnectionContext);
   useEffect(() => {
-    var t0 = performance.now();
     const queryReplies = async () => {
       const queryResults = await byprosQuery(queries.projects);
       const results: Promise<ProjectDetails>[] = queryResults.map(
