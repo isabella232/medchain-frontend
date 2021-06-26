@@ -51,6 +51,7 @@ const Pager: FunctionComponent<{
       {data?.slice(10 * page, 10 * page + 10).map((v) => {
         return (
           <TransactionLine
+            key={v.instanceid}
             transactionDetails={v}
             onClick={() => setSelectedTransaction(v)}
             selected={selectedTransaction === v}
@@ -112,6 +113,7 @@ export const ProjectsPager: FunctionComponent<{
       {data?.slice(10 * page, 10 * page + 10).map((v: any) => {
         return (
           <ProjectLine
+            key={v.instanceid}
             projectDetails={v}
             onClick={() => setSelectedProject(v)}
             selected={selectedProject === v}

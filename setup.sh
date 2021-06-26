@@ -21,13 +21,18 @@ show_spinner() {
     printf "    \b\b\b\b"
 }
 
+if ! command -v bcadmin &>/dev/null; then
+    echo "${RED}'bcadmin' (Byzcoin CLI) is needed to run this script. See the README for details about how to install bcadmin.${NC}"
+    exit 1
+fi
+
 if [[ -z "${BC_ADMIN_ID}" ]]; then
     echo "${RED}You need to define the administrator key as env variable before running this script!${NC}"
     echo "export BC_ADMIN_ID=ed25519:3b9637....."
     exit 1
 fi
 
-if [[ -z "${BC_ADMIN_ID}" ]]; then
+if [[ -z "${BC}" ]]; then
     echo "${RED}You need to define the Byzcoin config path as env variable before running this script!${NC}"
     echo 'export BC="/path/to/.../bc-ce98bc8ac...bed4038.cfg"'
     exit 1

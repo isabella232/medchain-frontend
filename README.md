@@ -19,18 +19,33 @@ The administration interface developed during this project is operational and ca
     - [3.2.2. Add the correct roster file](#322-add-the-correct-roster-file)
     - [3.2.3. npm run start to start the application](#323-npm-run-start-to-start-the-application)
     - [3.2.4. Build the project](#324-build-the-project)
-- [4. Organization](#4-organization)
-  - [4.1. Classes](#41-classes)
-  - [4.2. Components](#42-components)
-    - [4.2.1. Administration](#421-administration)
-    - [4.2.2. Projects](#422-projects)
-    - [4.2.3. Transactions](#423-transactions)
-    - [4.2.4. Other components](#424-other-components)
-  - [4.3. Services](#43-services)
-  - [4.4. Hooks](#44-hooks)
-  - [4.5. Packages](#45-packages)
-  - [4.6. Limitations](#46-limitations)
-  
+- [4. Functionalities walkthrough](#4-functionalities-walkthrough)
+  - [4.1. Administration Panel](#41-administration-panel)
+    - [4.1.1. Add an administrator](#411-add-an-administrator)
+    - [4.1.2. Remove an administrator](#412-remove-an-administrator)
+    - [4.1.3. Modify the multi-signature rule policy](#413-modify-the-multi-signature-rule-policy)
+    - [4.1.4. Modify an administrator identity](#414-modify-an-administrator-identity)
+  - [4.2. Transaction Panel](#42-transaction-panel)
+    - [4.2.1. Sign a transaction](#421-sign-a-transaction)
+    - [4.2.2. Execute a transaction](#422-execute-a-transaction)
+    - [4.2.3. View the past executed transactions](#423-view-the-past-executed-transactions)
+  - [4.3. Project Panel](#43-project-panel)
+    - [4.3.1. Create a new project](#431-create-a-new-project)
+    - [4.3.2. Add a user to a project](#432-add-a-user-to-a-project)
+    - [4.3.3. Add rights to a user](#433-add-rights-to-a-user)
+    - [4.3.4. remove rights from a user](#434-remove-rights-from-a-user)
+- [5. Organization](#5-organization)
+  - [5.1. Classes](#51-classes)
+  - [5.2. Components](#52-components)
+    - [5.2.1. Administration](#521-administration)
+    - [5.2.2. Projects](#522-projects)
+    - [5.2.3. Transactions](#523-transactions)
+    - [5.2.4. Other components](#524-other-components)
+  - [5.3. Services](#53-services)
+  - [5.4. Hooks](#54-hooks)
+  - [5.5. Packages](#55-packages)
+  - [5.6. Limitations](#56-limitations)
+ 
 # 3. Setup
 
 Below we detail how you can setup a local roster of nodes running a Byzcoin blockchain.
@@ -70,7 +85,6 @@ cd bypros
 docker-compose up
 ```
 
-
 **Start the conodes**
 
 Then, when you launch the conode, export the needed variables for the proxy. The proxy needs two URLs to connect to the database: one with read/write, and another one with read-only access.
@@ -106,11 +120,11 @@ export BC_CONFIG=conode/tmp
 bcadmin create $BC_CONFIG/public.toml
 ```
 
-Then export the Byzcoin chain configuration environment variable.
+The **previous** command will ouput directly the command you need to execute to export the configuration path for the newly created skipchain:
 
 ```sh
-# Tells bcadmin about the new skipchain configuration
-export BC=...
+
+export BC="conode/tmp/bc-722eac63e67c60ac4a1fc97905cce835e2ccce13613da626c1216c4510b8bb93.cfg"
 ```
 
 Then you need to export the administrator key in the `BC_ADMIN_ID` environment variable. To know the identity of the administrator run:
@@ -160,7 +174,7 @@ npm install
 
 ### 3.2.2. Add the correct roster file
 
-You first need to update `/src/services/roster.ts` to the correct roster, which can be found in `conode/tmp/public.toml` if you followed the instructions above.
+You first need to update `/src/services/roster.ts` to the correct roster, which can be found in `conode/tmp/public.toml` file in the medchain repository (See the [instructions above](#312-start-the-byzcoin-chain)).
 
 You also want to copy the ID of the genesis DARC and the ByzcoinID into the `/src/services/roster.ts` file. 
 
@@ -211,6 +225,9 @@ Public: 936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
 
 Then you need to ask Bypros to follow the Byzcoin roster (for the queries to run). You only need to do it once for every restart of the bypros docker containers.
 
+![Follow Byzcoin Proxy](src/screens/follow-proxy.png)
+
+
 ### 3.2.4. Build the project
 
 Builds the app for production to the `build` folder.\
@@ -221,29 +238,58 @@ It correctly bundles React in production mode and optimizes the build for the be
 npm run build
 ```
 
+# 4. Functionalities walkthrough
+
+## 4.1. Administration Panel
+
+### 4.1.1. Add an administrator
+
+### 4.1.2. Remove an administrator
+
+### 4.1.3. Modify the multi-signature rule policy
+
+### 4.1.4. Modify an administrator identity
+
+## 4.2. Transaction Panel
+
+### 4.2.1. Sign a transaction
+
+### 4.2.2. Execute a transaction
+
+### 4.2.3. View the past executed transactions
+
+## 4.3. Project Panel
+
+### 4.3.1. Create a new project 
+
+### 4.3.2. Add a user to a project
+
+### 4.3.3. Add rights to a user
+
+### 4.3.4. remove rights from a user
 
 
-# 4. Organization
+# 5. Organization
 
-## 4.1. Classes
+## 5.1. Classes
 
 `classes.ts` export an object that defines CSS classes, for reusability of certain classes accross multiple components.
 
-## 4.2. Components
+## 5.2. Components
 
-### 4.2.1. Administration
+### 5.2.1. Administration
 
 Contains all the components of the Administration page
 
-### 4.2.2. Projects
+### 5.2.2. Projects
 
 Contains all the components of the Projects page
 
-### 4.2.3. Transactions
+### 5.2.3. Transactions
 
 Contains all the components of the Transactions page
 
-### 4.2.4. Other components
+### 5.2.4. Other components
 
 - `Buttons.tsx` defines the buttons of the application
 - `ConnectModal.tsx` defines the modal for the connection (register of the public and private key pair)
@@ -253,7 +299,7 @@ Contains all the components of the Transactions page
 - `PanelElement` defines a section of a box in the UI
 - `Success.tsx` defines the success message component
 
-## 4.3. Services
+## 5.3. Services
 
 Contains all the different services used to communicate and manipulate the data of the app.
 
@@ -265,12 +311,12 @@ Contains all the different services used to communicate and manipulate the data 
 - `messages.ts` contains protobuf to Typescript message definition. These messages are used to unmarshall data from Byzcoin.
 - `roster.ts` contains all the connection details about the roster of conodes and the configuration of Byzcoin.
 
-## 4.4. Hooks
+## 5.4. Hooks
 
 `useLocalStorage.tsx` this hook is used by the `ConnectionContext` to store the public adn private key pair in the local storage of the web browser. 
 > Note that this is a limitation. [see below](#limitations)
   
-## 4.5. Packages
+## 5.5. Packages
 
 - [**TailwindCSS**](https://tailwindcss.com/): The CSS framework used for creating the styling of the project. The file `tailwind.config.js` is used to personalized the framework to add special styling and extend existing styles.
   > The documentation is incredible, you search anything in the search bar and you have all the different classes that you can use.
@@ -279,6 +325,6 @@ Contains all the different services used to communicate and manipulate the data 
 - [**@dedis/cothority**](https://www.npmjs.com/package/@dedis/cothority) package that provides methods used to communicate with Byzcoin
 - [**React Icons**](https://react-icons.github.io/react-icons) used to import icons in the application. This package is just a repository of most of the famous SVG libraries. You just import the icon in the component and during the build of the project for production it will include the SVG in the final build.
 
-## 4.6. Limitations
+## 5.6. Limitations
 
 Note that this is a limitation. For production environment, this setup provide no security if the private key. A solution would be to encrypt the private key and store the ciphertext in a JSON file. And decrypt at runtime asking for the password of the administrator.

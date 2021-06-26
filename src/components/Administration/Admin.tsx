@@ -66,6 +66,7 @@ const Admin = () => {
             {admins?.map((item) => {
               return (
                 <AdminElem
+                key={item}
                   name={item}
                   darc={darc as Darc}
                   setSuccess={setSuccess}
