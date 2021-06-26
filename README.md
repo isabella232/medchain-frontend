@@ -81,6 +81,7 @@ go install
 The Bypros proxy allows you to fetch data from Byzcoin by sending SQL queries to the Bypros proxy server. Still in the Medchain repository you need to lauch the Bypros service by running:
 
 ```sh
+# In the medchain repository
 cd bypros
 docker-compose up
 ```
@@ -95,6 +96,7 @@ export PROXY_DB_URL_RO=postgres://proxy:1234@localhost:5432/bypros
 ```
 
 ```sh
+# In the medchain repository
 cd conode
 # it will fail if the PROXY_DB_URL* variables are not set!
 go build -o conode && ./run_nodes.sh -v 3 -d tmp
@@ -114,23 +116,20 @@ We created a script that allow you to setup the Byzcoin DARC to be ready for run
 If you did not already created a new skipchain running
 
 ```sh
-# Tells bcadmin where the config folder is
-export BC_CONFIG=conode/tmp 
-# Create a new skipchain
-bcadmin create $BC_CONFIG/public.toml
+# Still in the medchain repository
+export BC_CONFIG=conode/tmp # Tells bcadmin where the config folder is
+bcadmin create $BC_CONFIG/public.toml # Create a new skipchain
 ```
 
 The **previous** command will ouput directly the command you need to execute to export the configuration path for the newly created skipchain:
 
 ```sh
-
 export BC="conode/tmp/bc-722eac63e67c60ac4a1fc97905cce835e2ccce13613da626c1216c4510b8bb93.cfg"
 ```
 
 Then you need to export the administrator key in the `BC_ADMIN_ID` environment variable. To know the identity of the administrator run:
 
 ```sh
-# Tells bcadmin about the new skipchain configuration
 bcadmin info
 - Config:
 -- Roster:
@@ -146,14 +145,19 @@ bcadmin info
 Then export the identity:
 
 ```sh
-# Tells bcadmin about the new skipchain configuration
 export BC_ADMIN_ID=ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
+```
+
+Now you need to go to the medchain administration ui repository:
+
+```sh
+cd path/to/medchain-frontend
 ```
 
 Once done just run the `setup` command of the Makefile:
 
 ```sh
-# Tells bcadmin about the new skipchain configuration
+# In the medchain-frontend repository
 make setup
 ```
 
@@ -179,7 +183,6 @@ You first need to update `/src/services/roster.ts` to the correct roster, which 
 You also want to copy the ID of the genesis DARC and the ByzcoinID into the `/src/services/roster.ts` file. 
 
 ```sh
-# Tells bcadmin about the new skipchain configuration
 bcadmin info
 - Config:
 -- Roster:
