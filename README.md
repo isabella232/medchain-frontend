@@ -86,6 +86,14 @@ cd bypros
 docker-compose up
 ```
 
+If you want to run the docker container in background you can run
+
+```sh
+# In the medchain repository
+cd bypros
+docker-compose up -d
+```
+
 **Start the conodes**
 
 Then, when you launch the conode, export the needed variables for the proxy. The proxy needs two URLs to connect to the database: one with read/write, and another one with read-only access.
@@ -117,14 +125,14 @@ If you did not already created a new skipchain running
 
 ```sh
 # Still in the medchain repository
-export BC_CONFIG=conode/tmp # Tells bcadmin where the config folder is
-bcadmin create $BC_CONFIG/public.toml # Create a new skipchain
+export BC_CONFIG=path/to/conode/tmp # Tells bcadmin where the config folder is
+bcadmin -c $BC_CONFIG create $BC_CONFIG/public.toml # Create a new skipchain
 ```
 
 The **previous** command will ouput directly the command you need to execute to export the configuration path for the newly created skipchain:
 
 ```sh
-export BC="conode/tmp/bc-722eac63e67c60ac4a1fc97905cce835e2ccce13613da626c1216c4510b8bb93.cfg"
+export BC="path/to/bc-722eac63e67c60ac4a1fc97905cce835e2ccce13613da626c1216c4510b8bb93.cfg"
 ```
 
 Then you need to export the administrator key in the `BC_ADMIN_ID` environment variable. To know the identity of the administrator run:
@@ -221,7 +229,7 @@ bcadmin info
 And then get the public and private key pair
 
 ```sh
-bcadmin key -print /path/to/.../bcadmin/data/key-ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f.cfg
+bcadmin key -print $BC_CONFIG/key-ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f.cfg
 Private: ec553855272bb591cf1d32753baf44cbac75ec57513a771537aad157c2088706
 Public: 936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
 ```
