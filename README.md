@@ -19,6 +19,9 @@ The administration interface developed during this project is operational and ca
     - [3.2.2. Add the correct roster file](#322-add-the-correct-roster-file)
     - [3.2.3. npm run start to start the application](#323-npm-run-start-to-start-the-application)
     - [3.2.4. Build the project](#324-build-the-project)
+  - [3.3. Cleanup](#33-cleanup)
+    - [3.3.1. Cleanup Bypros](#331-cleanup-bypros)
+    - [3.3.2. Cleanup Byzcoin nodes](#332-cleanup-byzcoin-nodes)
 - [4. Functionalities walkthrough](#4-functionalities-walkthrough)
   - [4.1. Register user keys](#41-register-user-keys)
   - [4.2. Administration Panel](#42-administration-panel)
@@ -48,7 +51,7 @@ The administration interface developed during this project is operational and ca
  
 # 3. Setup
 
-Below we detail how you can setup a local roster of nodes running a Byzcoin blockchain.
+Below we detail how you can setup a local roster of nodes running a Byzcoin blockchain. A video recording of the whole setup is available in the medchain [Google Drive](https://drive.google.com/file/d/12SjXxGTMoFNSw3HngJdmxCi6GLSEQNpR/view?usp=sharing).
 
 ## 3.1. Setup a Byzcoin chain
 
@@ -247,6 +250,27 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 ```sh
 npm run build
+```
+
+## 3.3. Cleanup
+
+This section explains how to cleanup all the generated files.
+
+### 3.3.1. Cleanup Bypros
+
+```sh
+# In the medchain repository
+cd bypros
+docker-compose down
+rm -rf postgres/*
+```
+
+### 3.3.2. Cleanup Byzcoin nodes
+
+```sh
+# In the medchain repository
+cd conode
+rm -rf tmp/*
 ```
 
 # 4. Functionalities walkthrough
