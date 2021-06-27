@@ -20,19 +20,20 @@ The administration interface developed during this project is operational and ca
     - [3.2.3. npm run start to start the application](#323-npm-run-start-to-start-the-application)
     - [3.2.4. Build the project](#324-build-the-project)
 - [4. Functionalities walkthrough](#4-functionalities-walkthrough)
-  - [4.1. Administration Panel](#41-administration-panel)
-    - [4.1.1. Add an administrator](#411-add-an-administrator)
-    - [4.1.2. Remove an administrator](#412-remove-an-administrator)
-    - [4.1.3. Modify the multi-signature rule policy](#413-modify-the-multi-signature-rule-policy)
-    - [4.1.4. Modify an administrator identity](#414-modify-an-administrator-identity)
-  - [4.2. Transaction Panel](#42-transaction-panel)
-    - [4.2.1. Sign and execute a transaction](#421-sign-and-execute-a-transaction)
-    - [4.2.3. View the past executed transactions](#423-view-the-past-executed-transactions)
-  - [4.3. Project Panel](#43-project-panel)
-    - [4.3.1. Create a new project](#431-create-a-new-project)
-    - [4.3.2. Add a user to a project](#432-add-a-user-to-a-project)
-    - [4.3.3. Add rights to a user](#433-add-rights-to-a-user)
-    - [4.3.4. remove rights from a user](#434-remove-rights-from-a-user)
+  - [4.1. Register user keys](#41-register-user-keys)
+  - [4.2. Administration Panel](#42-administration-panel)
+    - [4.2.1. Add an administrator](#421-add-an-administrator)
+    - [4.2.2. Remove an administrator](#422-remove-an-administrator)
+    - [4.2.3. Modify the multi-signature rule policy](#423-modify-the-multi-signature-rule-policy)
+    - [4.2.4. Modify an administrator identity](#424-modify-an-administrator-identity)
+  - [4.3. Transactions Panel](#43-transactions-panel)
+    - [4.3.1. Sign and execute a transaction](#431-sign-and-execute-a-transaction)
+    - [4.3.2. View the past executed transactions](#432-view-the-past-executed-transactions)
+  - [4.4. Projects Panel](#44-projects-panel)
+    - [4.4.1. Create a new project](#441-create-a-new-project)
+    - [4.4.2. Add a user to a project](#442-add-a-user-to-a-project)
+    - [4.4.3. Add rights to a user](#443-add-rights-to-a-user)
+    - [4.4.4. remove rights from a user](#444-remove-rights-from-a-user)
 - [5. Organization](#5-organization)
   - [5.1. Classes](#51-classes)
   - [5.2. Components](#52-components)
@@ -242,50 +243,87 @@ npm run build
 
 # 4. Functionalities walkthrough
 
-## 4.1. Administration Panel
+## 4.1. Register user keys
+
+When you first log into the application, you need to register your public and private key pair in order to sign transactions and interact with Byzcoin.
+
+![Register user keys](screens/keys.png)
+
+## 4.2. Administration Panel
+
+The administration panel is the page where administrator come to manage the administrator consortium.
 
 ![Administration Panewl](screens/administration.png)
 
-### 4.1.1. Add an administrator
+### 4.2.1. Add an administrator
+
+Administrators can register a new administrator in the administrator consortium.
 
 ![Add an administrator](screens/administration-add.png)
 
-### 4.1.2. Remove an administrator
+### 4.2.2. Remove an administrator
+
+Administrators can remove an administrator identity.
 
 ![Remove an administrator](screens/administration-remove.png)
 
-### 4.1.3. Modify the multi-signature rule policy
+### 4.2.3. Modify the multi-signature rule policy
+
+Administrators can modify the multisignature rule that transactions need to comply with in order for them to be executed.
 
 ![Modify multi signature rule](screens/administration-multisig.png)
 
-### 4.1.4. Modify an administrator identity
+### 4.2.4. Modify an administrator identity
+
+Administrators can also modify another administrator identity (ex: if the administrator lost access to his keys).
 
 ![Modify identity](screens/administration-edit.png)
 
-## 4.2. Transaction Panel
+## 4.3. Transactions Panel
+
+Administrators come to the transactions panel to sign and execute all pending deferred transactions
 
 ![Transactions panel](screens/transactions.png)
 
-### 4.2.1. Sign and execute a transaction
+### 4.3.1. Sign and execute a transaction
 
 ![Transactions sign and execute](screens/signExecute.png)
 
-### 4.2.3. View the past executed transactions
+### 4.3.2. View the past executed transactions
+
+In the history panel they can have a view of past executed transactions. They use that panel for audit purposes.
 
 ![Transaction History](screens/transactions-history.png)
 
-## 4.3. Project Panel
+## 4.4. Projects Panel
+
+The projects panel is the page where the administrators manage the different dataset access rights. 
 
 ![Projects panel](screens/projects.png)
 
-### 4.3.1. Create a new project 
+### 4.4.1. Create a new project 
 
-### 4.3.2. Add a user to a project
+They can create a new project.
 
-### 4.3.3. Add rights to a user
+![Add a new porject](screens/projects-add.png)
 
-### 4.3.4. remove rights from a user
+### 4.4.2. Add a user to a project
 
+They can add user to a project and give them access rights.
+
+![Add user to project](screens/projects-add-user.png)
+
+### 4.4.3. Add rights to a user
+
+They can also add other access rights to an existing user.
+
+![Add right to user](screens/project-add-rights.png)
+
+### 4.4.4. remove rights from a user
+
+They can also revoke the access rights of a user for a specific project.
+
+![Remove rights from user](screens/project-remove-rights.png)
 
 # 5. Organization
 
