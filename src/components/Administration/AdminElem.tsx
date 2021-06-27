@@ -3,6 +3,7 @@ import { FunctionComponent, useContext, useState } from "react";
 import { ConnectionContext } from "../../contexts/ConnectionContext";
 import { sendTransaction } from "../../services/cothorityGateway";
 import { validateIdentity } from "../../services/cothorityUtils";
+import { AiFillEdit } from "react-icons/ai";
 import {
   modifyAdminFromDarc,
   removeAdminFromDarc,
@@ -11,6 +12,8 @@ import { CopyButton } from "../Buttons";
 import Error, { ErrorMessage } from "../Error";
 import TransactionModal from "../TransactionModal";
 import ValidateAbort from "../ValidateAbort";
+import { MdCancel } from "react-icons/md";
+import classnames from "classnames";
 
 /**
  * Display the input field to modify an administrator key in the administration darc
@@ -120,10 +123,18 @@ const AdminElem: FunctionComponent<{
       ) : (
         <div className="flex space-x-2">
           <p>{name}</p>
-          <ValidateAbort
-            confirm={updateKey}
-            abort={() => setRemoveAdminModalOpen(true)}
-          />
+          <button
+            className={classnames("text-red-400")}
+            onClick={() => setRemoveAdminModalOpen(true)}
+          >
+            <MdCancel size={"1rem"} />
+          </button>
+          <button
+            onClick={() => setModifying(true)}
+            className={"text-primary-400"}
+          >
+            <AiFillEdit size={"1rem"} />
+          </button>
           <CopyButton elem={name} />
         </div>
       )}

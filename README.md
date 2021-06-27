@@ -26,8 +26,7 @@ The administration interface developed during this project is operational and ca
     - [4.1.3. Modify the multi-signature rule policy](#413-modify-the-multi-signature-rule-policy)
     - [4.1.4. Modify an administrator identity](#414-modify-an-administrator-identity)
   - [4.2. Transaction Panel](#42-transaction-panel)
-    - [4.2.1. Sign a transaction](#421-sign-a-transaction)
-    - [4.2.2. Execute a transaction](#422-execute-a-transaction)
+    - [4.2.1. Sign and execute a transaction](#421-sign-and-execute-a-transaction)
     - [4.2.3. View the past executed transactions](#423-view-the-past-executed-transactions)
   - [4.3. Project Panel](#43-project-panel)
     - [4.3.1. Create a new project](#431-create-a-new-project)
@@ -228,7 +227,7 @@ Public: 936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c071157b0f9f
 
 Then you need to ask Bypros to follow the Byzcoin roster (for the queries to run). You only need to do it once for every restart of the bypros docker containers.
 
-![Follow Byzcoin Proxy](src/screens/follow-proxy.png)
+![Follow Byzcoin Proxy](screens/follow-proxy.png)
 
 
 ### 3.2.4. Build the project
@@ -245,23 +244,39 @@ npm run build
 
 ## 4.1. Administration Panel
 
+![Administration Panewl](screens/administration.png)
+
 ### 4.1.1. Add an administrator
+
+![Add an administrator](screens/administration-add.png)
 
 ### 4.1.2. Remove an administrator
 
+![Remove an administrator](screens/administration-remove.png)
+
 ### 4.1.3. Modify the multi-signature rule policy
+
+![Modify multi signature rule](screens/administration-multisig.png)
 
 ### 4.1.4. Modify an administrator identity
 
+![Modify identity](screens/administration-edit.png)
+
 ## 4.2. Transaction Panel
 
-### 4.2.1. Sign a transaction
+![Transactions panel](screens/transactions.png)
 
-### 4.2.2. Execute a transaction
+### 4.2.1. Sign and execute a transaction
+
+![Transactions sign and execute](screens/signExecute.png)
 
 ### 4.2.3. View the past executed transactions
 
+![Transaction History](screens/transactions-history.png)
+
 ## 4.3. Project Panel
+
+![Projects panel](screens/projects.png)
 
 ### 4.3.1. Create a new project 
 
