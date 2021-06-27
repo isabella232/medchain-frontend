@@ -3,7 +3,6 @@ import { FunctionComponent } from "react";
 import { GiConfirmed } from "react-icons/gi";
 import { MdCancel } from "react-icons/md";
 
-
 const ValidateAbort: FunctionComponent<{
   confirm: () => void;
   abort: () => void;
@@ -11,13 +10,13 @@ const ValidateAbort: FunctionComponent<{
   return (
     <>
       <button className={classnames("text-green-400")} onClick={confirm}>
-        <GiConfirmed />
+        <GiConfirmed size={"1rem"} />
       </button>
       <button className={classnames("text-red-400")} onClick={abort}>
-        <MdCancel />
+        <MdCancel size={"1rem"} />
       </button>
     </>
   );
 };
 
-export default ValidateAbort
+export default ValidateAbort;

@@ -26,7 +26,7 @@ const Success: FunctionComponent<{
               setSuccess("");
             }}
           >
-            <MdCancel />
+            <MdCancel size={"1rem"}/>
           </button>
           <span className={classnames("font-bold ml-3 text-green-600")}>
             {title}

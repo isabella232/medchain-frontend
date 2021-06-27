@@ -30,7 +30,7 @@ const TransactionModal: FunctionComponent<{
           }}
           className={classnames("text-red-400")}
         >
-          <IoMdCloseCircle />
+          <IoMdCloseCircle size={"1rem"}/>
         </button>
         <span className={classnames("font-bold text-gray-600 ml-3")}>
           {title}

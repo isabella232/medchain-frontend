@@ -15,7 +15,7 @@ const Error: FunctionComponent<{
     <div className="bg-red-100 text-red-600 py-1 px-2 capitalize rounded-lg text-sm">
       <div className="text-red-400 flex">
         <button onClick={(e) => reset(undefined)}>
-          <MdCancel />
+          <MdCancel size={"1rem"} />
         </button>
         <span className={classnames("font-bold ml-3 text-red-600")}>
           {errorMessage.title}
