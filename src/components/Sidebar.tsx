@@ -11,7 +11,6 @@ import { EmptyReply } from "../services/messages";
 import { getRosterStr } from "../services/roster";
 import { formatAccountName } from "../tools/format";
 import ConnectModal from "./ConnectModal";
-import Error, { ErrorMessage } from "./Error";
 import Success from "./Success";
 
 const SidebarNavLink: FunctionComponent<{
@@ -36,7 +35,6 @@ const Sidebar = () => {
   const { connection, setConnection } = useContext(ConnectionContext);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [success, setSuccess] = useState("");
-  const [error, setError] = useState<ErrorMessage|undefined>(undefined);
   const followBypros = () => {
     byprosFollow().then(
       (reply: EmptyReply) => {

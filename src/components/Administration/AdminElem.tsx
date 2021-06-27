@@ -83,9 +83,6 @@ const AdminElem: FunctionComponent<{
 
   const { connection } = useContext(ConnectionContext);
   const [removeAdminModalOpen, setRemoveAdminModalOpen] = useState(false);
-  const updateKey = () => {
-    setModifying(true);
-  };
 
   const removeKey = () => {
     const tx = removeAdminFromDarc(darc, name);
