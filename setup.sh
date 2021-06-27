@@ -44,7 +44,7 @@ echo "${NC}"
 
 echo "${GREEN}## setting up rules for evolving the administration darc ##${NC}"
 echo "${DARK_GREEN}Adding rule invoke:darc.evolve${NC}"
-bcadmin darc rule --rule invoke:darc.evolve -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" &
+bcadmin darc rule --rule invoke:darc.evolve -id "threshold<${THRESHOLD},${BC_ADMIN_ID}>" --replace &
 show_spinner "$!"
 echo
 
