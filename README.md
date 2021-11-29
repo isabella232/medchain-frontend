@@ -55,14 +55,19 @@ Below we detail how you can setup a local roster of nodes running a Byzcoin bloc
 
 ## 3.1. Setup a Byzcoin chain
 
+We assume you are in a folder located at `$ROOT`
+
+```
+export ROOT=${PWD}
+```
+
 ### 3.1.1. Install medchain
 
 **You need to have the latest version of the Medchain administration cothority service**
 
 ```sh
+cd $ROOT
 git clone https://github.com/ldsec/medchain.git
-cd medchain
-
 ```
 
 -----------
@@ -74,8 +79,9 @@ cd medchain
 The Byzcoin CLI allows you to interact with the byzcoin blockchain with a low level of overhead.
 
 ```sh
+cd $ROOT
 git clone https://github.com/dedis/cothority.git
-cd cothority/byzcoin/bcadmin
+cd $ROOT/cothority/byzcoin/bcadmin
 go install
 ```
 
@@ -85,7 +91,7 @@ The Bypros proxy allows you to fetch data from Byzcoin by sending SQL queries to
 
 ```sh
 # In the medchain repository
-cd bypros
+cd $ROOT/medchain/bypros
 docker-compose up
 ```
 
@@ -93,22 +99,22 @@ If you want to run the docker container in background you can run
 
 ```sh
 # In the medchain repository
-cd bypros
+cd $ROOT/medchain/bypros
 docker-compose up -d
 ```
 
 **Start the conodes**
 
-Then, when you launch the conode, export the needed variables for the proxy. The proxy needs two URLs to connect to the database: one with read/write, and another one with read-only access.
+Then, when you launch the conode, export the needed variables for the proxy. The proxy needs two URLs to connect to the database: one with read/write, and another one with read-only access. ⚠️ If you opened a new terminal you might need to export again `$ROOT`.
 ```sh
- # user/password are set in the dockerfile (root) and the schema (read-only user).
+# user/password are set in the dockerfile (root) and the schema (read-only user).
 export PROXY_DB_URL=postgres://bypros:docker@localhost:5432/bypros
 export PROXY_DB_URL_RO=postgres://proxy:1234@localhost:5432/bypros
 ```
 
 ```sh
 # In the medchain repository
-cd conode
+cd $ROOT/medchain/conode
 # it will fail if the PROXY_DB_URL* variables are not set!
 go build -o conode && ./run_nodes.sh -v 3 -d tmp
 ```
@@ -128,7 +134,8 @@ If you did not already created a new skipchain running
 
 ```sh
 # Still in the medchain repository
-export BC_CONFIG=path/to/conode/tmp # Tells bcadmin where the config folder is
+cd $ROOT/medchain
+export BC_CONFIG=$ROOT/medchain/conode/tmp # Tells bcadmin where the config folder is
 bcadmin -c $BC_CONFIG create $BC_CONFIG/public.toml # Create a new skipchain
 ```
 
@@ -142,6 +149,7 @@ Then you need to export the administrator key in the `BC_ADMIN_ID` environment v
 
 ```sh
 bcadmin info
+=>
 - Config:
 -- Roster:
 --- tls://localhost:7774
@@ -162,13 +170,15 @@ export BC_ADMIN_ID=ed25519:936603dbfc52ae05513f102b7205b48390a5bd0eda578fcfb523c
 Now you need to go to the medchain administration ui repository:
 
 ```sh
-cd path/to/medchain-frontend
+cd $ROOT
+git clone https://github.com/ldsec/medchain-frontend.git
 ```
 
 Once done just run the `setup` command of the Makefile:
 
 ```sh
 # In the medchain-frontend repository
+cd $ROOT/medchain-frontend
 make setup
 ```
 
@@ -184,17 +194,19 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### 3.2.1. Install all the dependencies
 
 ```sh
+cd $ROOT/medchain-frontend
 npm install
 ```
 
 ### 3.2.2. Add the correct roster file
 
-You first need to update `/src/services/roster.ts` to the correct roster, which can be found in `conode/tmp/public.toml` file in the medchain repository (See the [instructions above](#312-start-the-byzcoin-chain)).
+You first need to update `$ROOT/medchain-frontend/src/services/roster.ts` to the correct roster, which can be found in `$ROOT/medchain/conode/tmp/public.toml` file in the medchain repository (See the [instructions above](#312-start-the-byzcoin-chain)).
 
-You also want to copy the ID of the genesis DARC and the ByzcoinID into the `/src/services/roster.ts` file. 
+You also want to copy the ID of the genesis DARC and the ByzcoinID into the `$ROOT/medchain-frontend/src/services/roster.ts` file. 
 
 ```sh
 bcadmin info
+=>
 - Config:
 -- Roster:
 --- tls://localhost:7774
@@ -209,6 +221,7 @@ bcadmin info
 ### 3.2.3. npm run start to start the application
 
 ```sh
+cd $ROOT/medchain-frontend
 npm run start
 ```
 
@@ -218,6 +231,7 @@ You find the keys by using `bcadmin`. Get the info of Byzcoin first to get the i
 
 ```sh
 bcadmin info
+=>
 - Config:
 -- Roster:
 --- tls://localhost:7774
@@ -249,6 +263,7 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 
 ```sh
+cd $ROOT/medchain-frontend
 npm run build
 ```
 
@@ -260,7 +275,7 @@ This section explains how to cleanup all the generated files.
 
 ```sh
 # In the medchain repository
-cd bypros
+cd $ROOT/medchain/bypros
 docker-compose down
 rm -rf postgres/*
 ```
@@ -269,7 +284,7 @@ rm -rf postgres/*
 
 ```sh
 # In the medchain repository
-cd conode
+cd $ROOT/medchain/conode
 rm -rf tmp/*
 ```
 
